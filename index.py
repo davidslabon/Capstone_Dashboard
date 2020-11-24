@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
+import plotly.graph_objects as go
 
 
 # Connect to main app.py file
@@ -17,44 +18,106 @@ from apps import dashboard, scoring, navbar
 # load and manipulate data for index page
 
 df = pd.read_pickle("datasets/dummy_df.pkl")
-gob = df.groupby(["region", "country", "alpha3code","year"])[["account_number"]].count()
-gob = gob.reset_index().sort_values(by="year")
+#gob = df.groupby(["region", "country", "alpha3code","year"])[["account_number"]].count()
+#gob = gob.reset_index().sort_values(by="year")
+gob = df.groupby(["alpha3code", "country"])["account_number"].count()
+gob = gob.reset_index()
+gob = gob.sort_values("account_number", ascending=False)
+gob = gob.reset_index(drop=True)
 
-fig = px.scatter_geo(
-    gob, 
-    locations="alpha3code", 
-    color="region",
-    hover_name="country", size="account_number",
-    animation_frame="year",
-    projection="natural earth"
-    )
+gob['text'] = gob['country'] + '<br>Count ' + (gob['account_number']).astype(str)
+limits = [(0,1),(2,5),(6,20),(21,50),(51,96)]
+colors = ["royalblue","crimson","lightseagreen","orange","lightgrey"]
+cities = []
+scale = 4
+
+fig = go.Figure()
+
+for i in range(len(limits)):
+    lim = limits[i]
+    df_sub = gob[lim[0]:lim[1]]
+    fig.add_trace(go.Scattergeo(
+        locationmode = 'ISO-3',
+        locations = df_sub["alpha3code"],
+        text = df_sub['text'],
+        marker = dict(
+            size = df_sub['account_number']*scale,
+            color = colors[i],
+            line_color='rgb(40,40,40)',
+            line_width=0.5,
+            sizemode = 'area'
+        ),
+        name = '{0} - {1}'.format(lim[0],lim[1])))
+    
+fig.update_geos(projection_type="orthographic")
 
 fig.update_layout(
-    title_text = "Participants per year",
-    title_xanchor= "center",
-    title_x = 0.5,
-    margin=dict(l=0, r=0, b=0,t=30 ,pad=0),
-    legend_xanchor="center",
-    legend_x = 0.5,
-    legend_orientation = "h",
-    height = 600
+        #title = {"text":"CDP Survey Participation per Country", "x":0.5, "xanchor":"center", "font_dict:{weight":"bold"},
+        showlegend = False,
+        geo = dict(
+            scope = 'world',
+            landcolor = 'rgb(217, 217, 217)',
+        ),
+        height=500, 
+        margin={"r":0,"t":15,"l":0,"b":0}
     )
+
+fig.update_geos(
+    resolution=50,
+    showcountries=True,
+    showland=True, landcolor="#FFFFF0",
+    showocean=True, oceancolor="LightBlue",
+)
 
 
 # ----------------------------------
+# creating cards
 
+""" card_intro = dbc.Card(
+    [   dbc.CardHeader(
+        html.H4("Project Idea")),
+        dbc.CardImg(src="/assets/logo.png", top=True, bottom=False,
+                title="project logo", alt='Loading Error'),
+        dbc.CardBody([
+            html.P("Collaboration opportunities between cities and businesses for a socially equitable climate change", className="card-text"),
+           
+        ]),
+    ], className="text-white bg-primary mb-3",
+)
+ """
+
+
+
+# ------------------------------------------------------------
+# app layout
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content', children=[])
 ])
 
-# ---------------------
-
+# -------------------------------------------------------------
+# index page 
 index_page = html.Div([
     navbar.navbar(),
-    html.H1('SCORE2 Landingpage', style={"textAlign": "center"}),
-    dcc.Graph(figure=fig)
+    html.Br(),
+    html.H2("Unlocking Climate Solutions", style={"textAlign":"center"}),
+    html.P("Indentification of Collaboration opportunities between cities and businesses for socially equitable climate risk mitigation", style={"textAlign":"center"}),
+    dbc.Row(dcc.Graph(figure=fig), justify="center"),
+    html.P("CDP Survey Participants per Country 2018-2020", style={"textAlign":"center"}),
+    html.Br(),
+    html.Br(),
+    html.P("Find out more about our project and our interactive dashboard:", style={"textAlign":"center"}),
+    dbc.Row([
+        dbc.Button("Dashboard", href='/apps/dashboard', color="primary", className="mr-1", size="lg",
+        style={"font-size": "larger", "text-decoration": "none"}),
+        dbc.Button("Project", href='/apps/scoring', color="primary", className="mr-1", size="lg",
+        style={"font-size": "larger", "text-decoration": "none"}),
+    ],
+    justify="center"),
+       
 ])
+
+# -------------------------------------------------------------
 
 
 @app.callback(Output('page-content', 'children'),
@@ -66,6 +129,8 @@ def display_page(pathname):
         return scoring.layout
     else:
         return index_page
+
+
 
 
 

@@ -10,7 +10,7 @@ def navbar():
                 id="page-1-link"
                 ),
             dbc.NavItem(dbc.NavLink(
-                "Methodology", 
+                "Project", 
                 href="/apps/scoring", 
                 style={"font-weight": "bold", "font-size": "larger", "text-decoration": "none"}), 
                 id="page-2-link"),
@@ -27,8 +27,9 @@ def navbar():
         ],
         brand="SCORE2",
         brand_href="/",
-        color="rgb(207, 219, 206)",
+        #color="lightgreen",
         light=True,
+        #className = "navbar text-white bg-primary mb-3",
         dark=False,
         fluid=True,
         brand_style= {"font-weight": "bold", "font-size": "larger", "text-decoration": "none"},

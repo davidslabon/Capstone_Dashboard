@@ -17,6 +17,80 @@ DATA_PATH = PATH.joinpath("../datasets").resolve()
 df = pd.read_pickle(DATA_PATH.joinpath("dummy_df.pkl"))  
 print(df.columns)
 # ------------------------------------------------------------------------------
+# create page content
+
+cards_team = dbc.CardDeck([
+    dbc.Card(
+        [
+            dbc.CardImg(src="/assets/picture_david.jpeg", top=True, bottom=False,
+                        title="David Slabon", alt='Loading Error'),
+            dbc.CardBody(
+                [
+                    html.H5("David Slabon", className="card-title"),
+                    dbc.CardLink("GitHub", href="https://github.com/davidslabon", target="_blank"),
+                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/dslabon", target="_blank"),
+                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/0ec00874-a6c0-4b9a-bf84-f51223318cb1", target="_blank")
+                                ],
+            ),
+        ],
+            #color="grey",   # https://bootswatch.com/default/ for more card colors
+            #inverse=True,   # change color of text (black or white)
+            #outline=False,  # True = remove the block colors from the background and header
+            className="card text-white bg-primary mb-3"
+    ),
+    dbc.Card(
+        [
+            dbc.CardImg(src="/assets/picture_felix.jpeg", top=True, bottom=False,
+                        title="Felix Seeliger", alt='Loading Error'),
+            dbc.CardBody(
+                [
+                    html.H5("Felix Seeliger", className="card-title"),
+                    dbc.CardLink("GitHub", href="https://github.com/Felixxxxxxxxxxx", target="_blank"),
+                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/felixseeliger/", target="_blank"),
+                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/3b74bfdb-7709-4cd9-977a-faa2ae9c4cfd", target="_blank")
+                                ]
+            ),
+        ],
+            className="card text-white bg-primary mb-3"
+    ),     
+    dbc.Card(
+        [
+            dbc.CardImg(src="/assets/picture_olaf.jpeg", top=True, bottom=False,
+                        title="Olaf Steenbeck", alt='Loading Error'),
+            dbc.CardBody(
+                [
+                    html.H5("Olaf Steenbeck", className="card-title"),
+                    dbc.CardLink("GitHub", href="https://github.com/osteenbeck", target="_blank"),
+                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/olaf-steenbeck-9349751b5/", target="_blank"),
+                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/628f1f4f-efb4-4d2a-b54b-4fc11e60a615", target="_blank")
+                                ]
+            ),
+        ],
+        className="card text-white bg-primary mb-3"
+    ),
+    dbc.Card(
+        [
+            dbc.CardImg(src="/assets/picture_tobias.jpeg", top=True, bottom=False,
+                        title="Tobias Seidel", alt='Loading Error'),
+            dbc.CardBody(
+                [
+                    html.H5("Tobias Seidel", className="card-title"),
+                    dbc.CardLink("GitHub", href="https://github.com/Toseidel", target="_blank"),
+                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/tobias-seidel/", target="_blank"),
+                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/656fb95c-f3ed-4892-9561-6fc58f6b0aca", target="_blank")
+                                ]
+            ),
+        ],
+        className="card text-white bg-primary mb-3"
+        ),
+    ],
+    #color="dark",   # https://bootswatch.com/default/ for more card colors
+    #inverse=False,   # change color of text (black or white)
+    #outline=True,  # True = remove the block colors from the background and header
+)
+
+# ------------------------------------------------------------------------------
+
 # App layout
 
 layout = html.Div([
@@ -89,5 +163,6 @@ layout = html.Div([
         #width={"size": 10, "offset": 1}
         )
     ),
+    dbc.Row(cards_team),
 ])
 

@@ -17,36 +17,34 @@ DATA_PATH = PATH.joinpath("../datasets").resolve()
 cs = [[0, "rgb(207, 219, 206)"],[1, "rgb(53, 66, 52)"]]
 
 
-df = pd.read_pickle(DATA_PATH.joinpath("dummy_df.pkl"))  
+df = pd.read_pickle(DATA_PATH.joinpath("new_dummy_df.pkl"))  
 
 
 # main dataframe 
 df = df.groupby(["country", "alpha3code", "type", "year"])[[
-                                                            'total', 
-                                                            's_score', 
-                                                            'c_score', 
-                                                            'o_score', 
-                                                            'r_score', 
-                                                            'e_score', 
-                                                            'e2_score']
+                                                            's_score_total', 
+                                                            'c_score_total', 
+                                                            'o_score_total', 
+                                                            'r_score_total', 
+                                                            'e_score_total', 
+                                                            'em_score_total']
                                                             ].mean()
 df.reset_index(inplace=True)
 print(df.info())
 
 # dashtable dataframe 
-tdf = pd.read_pickle(DATA_PATH.joinpath("dummy_df.pkl"))
-tdf = tdf.loc[:,["entity", "s_score", "c_score", "o_score", "r_score", "e_score", "year", "country", "type", "total"]]
-tdf.sort_values(by="total", ascending=False, inplace=True)
+tdf = pd.read_pickle(DATA_PATH.joinpath("new_dummy_df.pkl"))
+tdf = tdf.loc[:,["entity", "s_score_total", "c_score_total", "o_score_total", "r_score_total", "e_score_total", "year", "country", "type"]]
 utdf = tdf.copy()
 
 # radar datamframe
-rdf = pd.read_pickle(DATA_PATH.joinpath("dummy_df.pkl"))
-rdf = rdf.groupby("e_score")[[
-                            's_score', 
-                            'c_score', 
-                            'o_score', 
-                            'r_score', 
-                            'e2_score']
+rdf = pd.read_pickle(DATA_PATH.joinpath("new_dummy_df.pkl"))
+rdf = rdf.groupby("e_score_total")[[
+                            's_score_total', 
+                            'c_score_total', 
+                            'o_score_total', 
+                            'r_score_total', 
+                            'em_score_total']
                             ].mean()
 rdf.reset_index(inplace=True)
 print(rdf.info())
@@ -109,7 +107,7 @@ layout = html.Div([
                             {"name": i, "id": i, "deletable": False, "selectable": True, "hideable": True}
                             if i == "alpha3code" or i == "year" or i == "type"
                             else {"name": i.title().replace("_"," "), "id": i, "deletable": True, "selectable": True}
-                            for i in ["entity", "s_score", "c_score", "o_score", "r_score", "e_score"]
+                            for i in ["entity", "s_score_total", "c_score_total", "o_score_total", "r_score_total", "e_score_total"]
                         ],
                         data=tdf.to_dict('records'),  # the contents of the table
                         editable=True,              # allow editing of data inside all cells
@@ -218,7 +216,7 @@ def update_graph(*option_slctd):
     fig_map = go.Figure(
         data=[go.Choropleth(
             locations=dff["alpha3code"],
-            z=dff["total"],
+            z=dff["r_score_total"],
             colorscale=cs,
         )],
     )
@@ -237,12 +235,12 @@ def update_graph(*option_slctd):
 
     fig_bar = go.Figure(
         data=[
-            go.Bar(name="S", x=dff["year"], y=dff["s_score"], marker_color="rgb(207, 219, 206)"),
-            go.Bar(name="C",x=dff["year"], y=dff["c_score"], marker_color="rgb(169, 181, 168)"),
-            go.Bar(name="O",x=dff["year"], y=dff["o_score"], marker_color="rgb(121, 135, 120)"),
-            go.Bar(name="R",x=dff["year"], y=dff["r_score"], marker_color="rgb(89, 105, 88)"),
-            go.Bar(name="E",x=dff["year"], y=dff["e_score"], marker_color="rgb(64, 79, 63)"),
-            go.Bar(name="E2", x=dff["year"], y=dff["e2_score"], marker_color="rgb(53, 66, 52)"),
+            go.Bar(name="S", x=dff["year"], y=dff["s_score_total"], marker_color="rgb(207, 219, 206)"),
+            go.Bar(name="C",x=dff["year"], y=dff["c_score_total"], marker_color="rgb(169, 181, 168)"),
+            go.Bar(name="O",x=dff["year"], y=dff["o_score_total"], marker_color="rgb(121, 135, 120)"),
+            go.Bar(name="R",x=dff["year"], y=dff["r_score_total"], marker_color="rgb(89, 105, 88)"),
+            go.Bar(name="E",x=dff["year"], y=dff["e_score_total"], marker_color="rgb(64, 79, 63)"),
+            go.Bar(name="E2", x=dff["year"], y=dff["em_score_total"], marker_color="rgb(53, 66, 52)"),
         ],
     )
 
@@ -287,7 +285,7 @@ def update_rows(*option_slctd):
 def update_radar(option_slctd):
 
     rdff = rdf.copy()
-    rdff = rdff[rdff["e_score"] == option_slctd]   
+    rdff = rdff[rdff["e_score_total"] == option_slctd]   
 
     fig_radar = go.Figure(data=go.Scatterpolar(
         r = rdff.values.flatten(),
