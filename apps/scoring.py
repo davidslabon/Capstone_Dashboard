@@ -14,7 +14,8 @@ from apps import navbar
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("../datasets").resolve()
 
-df = pd.read_pickle(DATA_PATH.joinpath("dummy_df.pkl"))  
+df = pd.read_csv(DATA_PATH.joinpath("score_descriptions.csv")) 
+df = df.loc[:, ["score", "s_type", "score_short_desc"]]
 print(df.columns)
 # ------------------------------------------------------------------------------
 # create page content
@@ -88,7 +89,63 @@ cards_team = dbc.CardDeck([
     #inverse=False,   # change color of text (black or white)
     #outline=True,  # True = remove the block colors from the background and header
 )
+# ======================
 
+card_content_1 = [
+    dbc.CardHeader("Card header"),
+    dbc.CardBody(
+        [
+            html.H5("Card title", className="card-title"),
+            html.P(
+                "This is some card content that we'll reuse",
+                className="card-text",
+            ),
+        ]
+    ),
+]
+
+card_content_2 = dbc.CardBody(
+    [
+        html.Blockquote(
+            [
+                html.P(
+                    "A learning experience is one of those things that says, "
+                    "'You know that thing you just did? Don't do that.'"
+                ),
+                html.Footer(
+                    html.Small("Douglas Adams", className="text-muted")
+                ),
+            ],
+            className="blockquote",
+        )
+    ]
+)
+
+card_content_3 = [
+    dbc.CardImg(src="/static/images/placeholder286x180.png", top=True),
+    dbc.CardBody(
+        [
+            html.H5("Card with image", className="card-title"),
+            html.P(
+                "This card has an image on top, and a button below",
+                className="card-text",
+            ),
+            dbc.Button("Click me!", color="primary"),
+        ]
+    ),
+]
+
+
+cards = dbc.CardColumns(
+    [
+        dbc.Card(card_content_1, color="primary", inverse=True),
+        dbc.Card(card_content_2, body=True),
+        dbc.Card(card_content_1, color="secondary", inverse=True),
+        dbc.Card(card_content_3, color="info", inverse=True),
+        dbc.Card(card_content_1, color="success", inverse=True),
+    ]
+)
+#=======================
 # ------------------------------------------------------------------------------
 
 # App layout
@@ -106,19 +163,14 @@ layout = html.Div([
         ),
     ]),
     html.Br(),
-    dbc.Row(
+    dbc.Row([
         dbc.Col(
             html.Div([
                 dash_table.DataTable(
                     id='datatable-interactivity',
                     columns=[
                         {"name": i, "id": i, "deletable": False, "selectable": True, "hideable": True}
-                        if i == "alpha3code" or i == "year" or i == "type"
-                        else {"name": i.title().replace("_"," "), "id": i, "deletable": True, "selectable": True}
-                        for i in ['theme', 'account_number', 'public', 'entity',
-                        'country', 'region', 'population', 'city', 
-                        'authority_types', 'activities','s_score',
-                        'c_score', 'o_score', 'r_score', 'e_score', 'e2_score', 'total']
+                        for i in df.columns
                     ],
                     data=df.to_dict('records'),  # the contents of the table
                     editable=True,              # allow editing of data inside all cells
@@ -132,22 +184,22 @@ layout = html.Div([
                     selected_rows=[],           # indices of rows that user selects
                     page_action="native",       # all data is passed to the table up-front or not ('none')
                     page_current=0,             # page number that user is on
-                    page_size=10,                # number of rows visible per page
+                    #page_size=10,                # number of rows visible per page
                     style_cell={                # ensure adequate header width when text is shorter than cell's text
                         #'minWidth': 10, 
-                        'maxWidth': 95, 
+                        'maxWidth': 20, 
                         'width': "auto", 
                         "textAlign": "left",
                         'font-family':'sans-serif'
                     },
                     style_cell_conditional=[    # align text columns to left. By default they are aligned to right
                         {
-                        'if': {'column_id': c},
-                        #'minWidth': 10, 
+                        'if': {'column_id': "score_short_desc"},
+                        'minWidth': 50, 
                         'maxWidth': 95, 
                         'width': "auto", 
                         'textAlign': 'left'
-                        } for c in ['entity']
+                        } 
                     ],
                     style_data={                # overflow cells' content into multiple lines
                         'whiteSpace': 'normal',
@@ -160,8 +212,10 @@ layout = html.Div([
                     style_table={'overflowX': 'auto', "padding":"10px 20px 20px 20px"} 
                 ),
             ]),
-        #width={"size": 10, "offset": 1}
-        )
+        width={"size": 6, "offset":0}
+        ),
+        dbc.Col(cards)
+    ]
     ),
     dbc.Row(cards_team),
 ])

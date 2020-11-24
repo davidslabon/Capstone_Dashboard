@@ -4,7 +4,7 @@ def navbar():
     navbar = dbc.NavbarSimple(
         children=[
             dbc.NavItem(dbc.NavLink(
-                "Vizualisaton", 
+                "Dashboard", 
                 href="/apps/dashboard", 
                 style={"font-weight": "bold", "font-size": "larger", "text-decoration": "none"}), 
                 id="page-1-link"
@@ -27,10 +27,10 @@ def navbar():
         ],
         brand="SCORE2",
         brand_href="/",
-        #color="lightgreen",
-        light=True,
-        #className = "navbar text-white bg-primary mb-3",
-        dark=False,
+        color="bg-primary",
+        light=False,
+        className = "bg-primary",
+        dark=True,
         fluid=True,
         brand_style= {"font-weight": "bold", "font-size": "larger", "text-decoration": "none"},
         )
