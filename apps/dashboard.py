@@ -19,20 +19,8 @@ cs = [[0, "rgb(207, 219, 206)"],[1, "rgb(53, 66, 52)"]]
 
 df = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))  
 
-
-# main dataframe 
-df = df.groupby(["region","country", "alpha3code", "type", "year"])[[
-                                                            's_score_total', 
-                                                            'c_score_total', 
-                                                            'o_score_total', 
-                                                            'r_score_total', 
-                                                            'e_score_total', 
-                                                            'em_score_total']
-                                                            ].agg(lambda x: x.mean(skipna=True))
-df.reset_index(inplace=True)
-
-# overall score df
-odf = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))
+country_list = df.country.sort_values().unique()
+region_list = df.region.sort_values().unique()
 
 # dashtable dataframe 
 tdf = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))
@@ -87,7 +75,7 @@ row1_cards = dbc.CardDeck([
             dcc.Dropdown(
                 id="slct_region", 
                 placeholder='Select a region',
-                options=[{"label":x, "value":x} for x in df.region.unique()],
+                options=[{"label":x, "value":x} for x in region_list],
                 multi=True,
                 value="",
             ),
@@ -95,7 +83,7 @@ row1_cards = dbc.CardDeck([
             dcc.Dropdown(
                 id="slct_country", 
                 placeholder='Select a country',
-                options=[{"label":x, "value":x} for x in df.country.unique()],
+                options=[{"label":x, "value":x} for x in country_list],
                 multi=True,
                 value="",
             ),
@@ -112,16 +100,25 @@ row1_cards = dbc.CardDeck([
         ])
     ]),
     dbc.Card([
-        dbc.CardHeader("Score per Category"),
+        dbc.CardHeader("Score Dimensions"),
         dcc.Graph(id='score_bar', figure={})
     ]),
     dbc.Card([
-        dbc.CardHeader("Overall Score"),
+        dbc.CardHeader("Total Score Distribution"),
         dcc.Graph(id="total_score", figure={})
     ]),
     dbc.Card([
-        dbc.CardHeader("Missings"),
-        dcc.Graph(id="missings", figure={})
+        dbc.CardHeader("Summary"),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Div(id="avg_score", children=[], style={'fontWeight': 'bold', 'fontSize': 40, "vertical-align": "middle", "text-align":"center"}),
+        html.Div("Average Total Score", style={'fontWeight': 'bold', 'fontSize': 20, "vertical-align": "middle", "text-align":"center"}),
+        html.Br(),
+        html.Br(),
+        html.Div(id="no_scores", children=[], style={'fontWeight': 'bold', 'fontSize': 40, "vertical-align": "middle", "text-align":"center"}),
+        html.Div("Responses",style={'fontWeight': 'bold', 'fontSize': 20, "vertical-align": "middle", "text-align":"center"}),
+
     ])
 ])
 
@@ -135,12 +132,9 @@ row2_cards = dbc.CardDeck([
     className="w-75"),
     dbc.Card([
         dbc.CardHeader("Highlights / Lowlights"),
-        html.P("Top Entities"),
-        html.Div(id="top_table", children=[]),
         html.Br(),
-        html.P("Flop Entities"),
-        html.Div(id="flop_table", children=[]),
-    
+        html.Div(id="table", children=[]),
+        html.Br(),  
     ],
     className="w-25")
 ])
@@ -298,7 +292,7 @@ row4_cards = dbc.CardGroup([
 layout = html.Div([
     navbar.navbar(),
     html.Br(),
-    html.H1("Overall Scores"),
+    html.H1("Overview"),
     row1_cards,
     html.Br(),
     row2_cards,
@@ -320,10 +314,10 @@ layout = html.Div([
 @app.callback(
     [Output(component_id='score_bar', component_property='figure'),
      Output(component_id='total_score', component_property='figure'),
-     Output(component_id='missings', component_property='figure'),
+     Output(component_id='avg_score', component_property='children'),
+     Output(component_id='no_scores', component_property='children'),
      Output(component_id='avg_score_map', component_property='figure'),
-     Output(component_id='top_table', component_property='children'),
-     Output(component_id='flop_table', component_property='children')],
+     Output(component_id='table', component_property='children')],
     [Input(component_id='slct_type', component_property='value'),
      Input(component_id='slct_country', component_property='value'),
      Input(component_id='slct_year', component_property='value'),
@@ -383,8 +377,7 @@ def update_graphs(*option_slctd):
     score_bins = pd.cut(x = dff.score_total, bins=[0,1.5,2.5,3.5,4.5,6], labels=["1","2","3","4","5"])
     score_bins = round((score_bins.value_counts(normalize=True)*100),1)
     score_bins = score_bins.sort_index()
-    print(dff)
-
+  
     labels = ['1','2','3','4','5']
     values = score_bins.values
 
@@ -392,11 +385,10 @@ def update_graphs(*option_slctd):
     fig_donut = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3, sort=False)])
 
 
-    # id: 'missings' -> plot stacked missings
-    missing = (dff.score_total.isna().sum() / len(dff.score_total))*100
-    available = 100-missing
-
-    fig_missing = px.bar(x=["score","score"], y=[available, missing], color=["available", "missing"])
+    # id: 'avg_score' -> plot stacked missings
+    avg_score = round(dff.score_total.mean(),2)
+    no_scores = dff.score_total.dropna()
+    no_scores = len(no_scores)
 
 
     # id: 'avg_score_map' -> plot map viz
@@ -417,7 +409,6 @@ def update_graphs(*option_slctd):
                     pad=10
                     ),
             #paper_bgcolor="LightSteelBlue",
-        #colorscale="viridis"
     )
 
     
@@ -431,20 +422,21 @@ def update_graphs(*option_slctd):
     if option_slctd[0]:
         tdff = tdff[tdff["type"].isin(option_slctd[0])] 
 
-    tdff["score_total"] = tdff.loc[:,"s_score_total":"em_score_total"].mean(axis=1)
+    tdff["score_total"] = round(tdff.loc[:,"s_score_total":"em_score_total"].mean(axis=1), 2)
     tdff = tdff.dropna(axis="rows", subset=["score_total"])
     tdff.sort_values(by="score_total", ascending=False, inplace=True)
-    top_df = tdff.head(3).loc[:, ["entity", "country","score_total"]]
-    top_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country"}, inplace=True)
-    top_table = dbc.Table.from_dataframe(top_df, striped=True, bordered=True, hover=True, size="sm")
-
-    flop_df = tdff.tail(3).loc[:, ["entity", "country","score_total"]]
-    flop_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country"}, inplace=True)
-    flop_table = dbc.Table.from_dataframe(flop_df, striped=True, bordered=True, hover=True, size="sm")
-
+    top_df = tdff.head(3).loc[:, ["entity", "country", "year", "score_total"]]
+    top_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country", "year":"Year"}, inplace=True)
     
+    line = pd.DataFrame({"Entity":"...", "Country":"...", "Year":"...", "Total Score":"..."}, index =[3])
+    
+    flop_df = tdff.tail(3).loc[:, ["entity", "country", "year", "score_total"]]
+    flop_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country", "year":"Year"}, inplace=True)
+    
+    result_df = pd.concat([top_df, line, flop_df])
+    table = dbc.Table.from_dataframe(result_df, striped=True, bordered=True, hover=True, size="sm")
 
-    return fig_bar, fig_donut, fig_missing, fig_map, top_table, flop_table
+    return fig_bar, fig_donut, avg_score, no_scores, fig_map, table
 
 
     
