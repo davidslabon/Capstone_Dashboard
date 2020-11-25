@@ -54,7 +54,14 @@ def plot_subscore(data, score_number):
         xanchor="right",
         x=1
     ),
-    xaxis_title = "")
+    xaxis_title = None,
+    yaxis_title = None,
+    margin={
+        "l":0,
+        "r":5,
+        "b":0
+    },
+    template="simple_white")
 
     return fig
 
@@ -246,13 +253,20 @@ row3_cards = dbc.CardDeck([
             )
         ])
     ]),
+
     dbc.Card([
-        dbc.CardHeader("No of results"),
-        html.P("Cities:"),
-        html.Div(id="city_results", children=[]),
-        html.P("Corporates:"),
-        html.Div(id="corporate_results", children=[])
-    ]),
+        dbc.CardHeader("No of Results"),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Div(id="city_results", children=[], style={'fontWeight': 'bold', 'fontSize': 40, "vertical-align": "middle", "text-align":"center"}),
+        html.Div("Cities in range", style={'fontWeight': 'bold', 'fontSize': 20, "vertical-align": "middle", "text-align":"center"}),
+        html.Br(),
+        html.Br(),
+        html.Div(id="corporate_results", children=[], style={'fontWeight': 'bold', 'fontSize': 40, "vertical-align": "middle", "text-align":"center"}),
+        html.Div("Corporates in range",style={'fontWeight': 'bold', 'fontSize': 20, "vertical-align": "middle", "text-align":"center"}),
+
+    ])
 ])
 
 row4_cards = dbc.CardGroup([
