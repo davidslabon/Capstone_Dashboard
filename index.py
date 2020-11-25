@@ -71,6 +71,24 @@ fig.update_geos(
 # ----------------------------------
 # creating cards
 
+card_content_kaggle = [
+    dbc.CardHeader("Competition"),
+    html.Br(),
+    dbc.CardImg(src="/assets/kaggle.png", top=True, bottom=False,
+                        title="kaggle", alt='Loading Error', style={'height':'70%', 'width':'70%', },),
+    dbc.CardBody(
+        html.P("bla, bla, bla")
+    )
+]
+
+card_content_cdp = [
+    dbc.CardHeader("Project Idea"),
+    dbc.CardImg(src="/assets/cdp.png", top=True, bottom=False,
+                        title="environment", alt='Loading Error', style={'height':'70%', 'width':'70%'}),
+    dbc.CardBody(
+        html.P("bla, bla, bla")
+    )
+]
 # ------------------------------------------------------------
 # app layout
 app.layout = html.Div([
@@ -83,30 +101,39 @@ app.layout = html.Div([
 index_page = html.Div([
     navbar.navbar(),
     html.Br(),
-    dbc.Row(
-    dbc.Card([
-        dbc.CardHeader("Unlocking Climate Solutions"),
-        dbc.CardBody([
-            html.P("Indentification of Collaboration opportunities between cities and businesses for socially equitable climate risk mitigation", style={"textAlign":"center"}),
-            dcc.Graph(figure=fig),
-            html.P("CDP Survey Participants per Country 2018-2020", style={"textAlign":"center"}),
+    dbc.CardDeck([
+        dbc.Card([
+            dbc.CardHeader("Unlocking Climate Solutions"),
+            dbc.CardBody([
+                html.P("Indentification of Collaboration opportunities between cities and businesses for socially equitable climate risk mitigation", style={"textAlign":"center"}),
+                dcc.Graph(figure=fig),
+                html.P("CDP Survey Participants per Country 2018-2020", style={"textAlign":"center"}),
+                html.Br(),
+                html.Br(),
+                html.P("Find out more about our project and our interactive dashboard!", style={"textAlign":"center"}),
+                dbc.Row([
+                    dbc.Button("Dashboard", href='/apps/dashboard', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("Project", href='/apps/scoring', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                )
+            ])
+        ],
+        className="w-75",
+        ),
+        dbc.Col(
+            [
+            dbc.Card(card_content_kaggle, inverse=False), #color="primary", inverse=True),
             html.Br(),
-            html.Br(),
-            html.P("Find out more about our project and our interactive dashboard!", style={"textAlign":"center"}),
-            dbc.Row([
-                dbc.Button("Dashboard", href='/apps/dashboard', color="primary", className="mr-1", size="lg",
-                style={"font-size": "larger", "text-decoration": "none"}),
-                dbc.Button("Project", href='/apps/scoring', color="primary", className="mr-1", size="lg",
-                style={"font-size": "larger", "text-decoration": "none"}),
-            ],
-            justify="center"
-            )
-        ])
-    ],
-    className="w-75",
-    ),
-    justify="center")      
+            dbc.Card(card_content_cdp), #color="secondary", inverse=True),
+            ]
+        )
+
+    ])
 ])
+
 
 # -------------------------------------------------------------
 

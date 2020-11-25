@@ -21,14 +21,14 @@ df = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))
 
 
 # main dataframe 
-df = df.groupby(["country", "alpha3code", "type", "year"])[[
+df = df.groupby(["region","country", "alpha3code", "type", "year"])[[
                                                             's_score_total', 
                                                             'c_score_total', 
                                                             'o_score_total', 
                                                             'r_score_total', 
                                                             'e_score_total', 
                                                             'em_score_total']
-                                                            ].mean()
+                                                            ].agg(lambda x: x.mean(skipna=True))
 df.reset_index(inplace=True)
 
 # dashtable dataframe 
@@ -38,6 +38,33 @@ tdf = tdf.loc[:,["entity", "s_score_total", "c_score_total", "o_score_total", "r
 # radar dataframe
 rdf = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl")) 
 
+# score definition
+
+all_sub_scores = [
+    ['s_score_1', 's_score_2'], # social
+    ['c_score_1', 'c_score_2', 'c_score_3', 'c_score_4', 'c_score_5', 'c_score_6'], # collab
+    ['o_score_1', 'o_score_2', 'o_score_3', 'o_score_4', 'o_score_5', 'o_score_6', 'o_score_7'], # opportunity 
+    ['r_score_1', 'r_score_2', 'r_score_3', 'r_score_5', 'r_score_6', 'r_score_7'],  # risk
+    ['e_score_1', 'e_score_2', 'e_score_3', 'e_score_4', 'e_score_6', 'e_score_7', 'e_score_8', 'e_score_9', 'e_score_10', 'e_score_11'], # engagement
+    ['em_score_1', 'em_score_2'] # emissions
+    ]
+
+def plot_subscore(data, score_number):
+    cols = ["type"] + all_sub_scores[score_number] 
+    data = data.loc[:, cols]
+
+    fig = px.bar(data, x="type", y=cols[1:], barmode="group")
+    fig.update_layout(legend=dict(
+        title_text='',
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ),
+    xaxis_title = "")
+
+    return fig
 
 # ------------------------------------------------------------------------------
 # prepare contents
@@ -52,6 +79,14 @@ row1_cards = dbc.CardDeck([
                 options=[{'label': 'Cities', 'value': 'cities'},
                         {'label': 'Corporates', 'value': 'corporates'}],
                 multi=True
+            ),
+            html.Br(),
+            dcc.Dropdown(
+                id="slct_region", 
+                placeholder='Select a region',
+                options=[{"label":x, "value":x} for x in df.region.unique()],
+                multi=True,
+                value="",
             ),
             html.Br(),
             dcc.Dropdown(
@@ -119,7 +154,14 @@ row3_cards = dbc.CardDeck([
                 min=1,
                 max=5,
                 step=0.5,
-                value=[1, 5]
+                value=[1, 5],
+                marks={
+                    1: "1",
+                    2: "2",
+                    3: "3",
+                    4: "4",
+                    5: "5"
+                }
             ),
             html.P("Collaboration"), 
             dcc.RangeSlider(
@@ -128,7 +170,14 @@ row3_cards = dbc.CardDeck([
                 min=1,
                 max=5,
                 step=0.5,
-                value=[1, 5]
+                value=[1, 5],
+                marks={
+                    1: "1",
+                    2: "2",
+                    3: "3",
+                    4: "4",
+                    5: "5"
+                }
             ),
             html.P("Opportunities"), 
             dcc.RangeSlider(
@@ -137,7 +186,14 @@ row3_cards = dbc.CardDeck([
                 min=1,
                 max=5,
                 step=0.5,
-                value=[1, 5]
+                value=[1, 5],
+                marks={
+                    1: "1",
+                    2: "2",
+                    3: "3",
+                    4: "4",
+                    5: "5"
+                }
             ),
             html.P("Risks"), 
             dcc.RangeSlider(
@@ -146,7 +202,14 @@ row3_cards = dbc.CardDeck([
                 min=1,
                 max=5,
                 step=0.5,
-                value=[1, 5]
+                value=[1, 5],
+                marks={
+                    1: "1",
+                    2: "2",
+                    3: "3",
+                    4: "4",
+                    5: "5"
+                }
             ),
             html.P("Engagement"), 
             dcc.RangeSlider(
@@ -155,7 +218,14 @@ row3_cards = dbc.CardDeck([
                 min=1,
                 max=5,
                 step=0.5,
-                value=[1, 5]
+                value=[1, 5],
+                marks={
+                    1: "1",
+                    2: "2",
+                    3: "3",
+                    4: "4",
+                    5: "5"
+                }   
             ),
             html.P("Emissions"), 
             dcc.RangeSlider(
@@ -164,7 +234,14 @@ row3_cards = dbc.CardDeck([
                 min=1,
                 max=5,
                 step=0.5,
-                value=[1, 5]
+                value=[1, 5],
+                marks={
+                    1: "1",
+                    2: "2",
+                    3: "3",
+                    4: "4",
+                    5: "5"
+                }
             )
         ])
     ]),
@@ -177,6 +254,32 @@ row3_cards = dbc.CardDeck([
     ]),
 ])
 
+row4_cards = dbc.CardGroup([
+    dbc.Card([
+        dbc.CardHeader("Social"),
+        dcc.Graph(id="s_score", figure={})
+    ]),
+        dbc.Card([
+        dbc.CardHeader("Collaboration"),
+        dcc.Graph(id="c_score", figure={})
+    ]),
+        dbc.Card([
+        dbc.CardHeader("Opportunities"),
+        dcc.Graph(id="o_score", figure={})
+    ]),
+        dbc.Card([
+        dbc.CardHeader("Risks"),
+        dcc.Graph(id="r_score", figure={})
+    ]),
+        dbc.Card([
+        dbc.CardHeader("Engagement"),
+        dcc.Graph(id="e_score", figure={})
+    ]),
+        dbc.Card([
+        dbc.CardHeader("Emissions"),
+        dcc.Graph(id="em_score", figure={})
+    ])
+])
 
 
 
@@ -189,12 +292,17 @@ row3_cards = dbc.CardDeck([
 layout = html.Div([
     navbar.navbar(),
     html.Br(),
+    html.H1("Overall Scores"),
     row1_cards,
     html.Br(),
     row2_cards,
     html.Br(),
+    html.H1("Dependencies"),
     row3_cards,
     html.Br(),
+    row4_cards,
+    html.Br(),
+    html.H1("Detailed Comparison"),
 ])
 
 
@@ -211,7 +319,8 @@ layout = html.Div([
      Output(component_id='top5_table', component_property='children')],
     [Input(component_id='slct_type', component_property='value'),
      Input(component_id='slct_country', component_property='value'),
-     Input(component_id='slct_year', component_property='value')]
+     Input(component_id='slct_year', component_property='value'),
+     Input(component_id='slct_region', component_property='value')]
 )
 
 def update_graphs(*option_slctd):
@@ -223,16 +332,18 @@ def update_graphs(*option_slctd):
     if option_slctd[1]:
         dff = dff[dff["country"].isin(option_slctd[1])] 
     if option_slctd[0]:
-        dff = dff[dff["type"].isin(option_slctd[0])] 
+        dff = dff[dff["type"].isin(option_slctd[0])]
+    if option_slctd[3]:
+        dff = dff[dff["region"].isin(option_slctd[3])]
 
     gob = dff.groupby(["year"])[[
-                                's_score_total', 
-                                'c_score_total', 
-                                'o_score_total', 
-                                'r_score_total', 
-                                'e_score_total', 
-                                'em_score_total']
-                                ].mean()
+                            's_score_total', 
+                            'c_score_total', 
+                            'o_score_total', 
+                            'r_score_total', 
+                            'e_score_total', 
+                            'em_score_total']
+                            ].mean()
     gob.reset_index(inplace=True)
     
     # id: 'score_bar' -> plot bar_chart
@@ -245,7 +356,6 @@ def update_graphs(*option_slctd):
             go.Bar(name="E",x=gob["year"], y=gob["e_score_total"]), #marker_color="rgb(64, 79, 63)"),
             go.Bar(name="E2", x=gob["year"], y=gob["em_score_total"]), #marker_color="rgb(53, 66, 52)"),
         ],
-        #marker_color="viridis"
     )
 
     fig_bar.update_layout(
@@ -270,9 +380,9 @@ def update_graphs(*option_slctd):
 
     labels = ['1','2','3','4','5']
     values = score_bins.values
+    print(dff.head())
     
-    
-    fig_donut = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    fig_donut = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3, sort=False)])
 
 
     # id: 'missings' -> plot stacked missings
@@ -328,7 +438,13 @@ def update_graphs(*option_slctd):
 
 @app.callback([Output(component_id='score_radar', component_property='figure'),
     Output(component_id='city_results', component_property='children'),
-    Output(component_id='corporate_results', component_property='children')],   
+    Output(component_id='corporate_results', component_property='children'),
+    Output(component_id='s_score', component_property='figure'),
+    Output(component_id='c_score', component_property='figure'),
+    Output(component_id='o_score', component_property='figure'),
+    Output(component_id='r_score', component_property='figure'),
+    Output(component_id='e_score', component_property='figure'),
+    Output(component_id='em_score', component_property='figure')],   
     [Input(component_id='slct_s_score', component_property='value'),
     Input(component_id='slct_c_score', component_property='value'),
     Input(component_id='slct_o_score', component_property='value'),
@@ -341,31 +457,30 @@ def update_graphs(*option_slctd):
 def update_radar(*option_slctd):
     
     rdff = rdf.copy() 
-
-    ci_gob = rdff.query("type=='cities'").loc[:, "s_score_total":"em_score_total"]
-    ci_gob = ci_gob.query(
-        "s_score_total >= @option_slctd[0][0] & s_score_total <= @option_slctd[0][1]\
+    rdff = rdff.query(
+        "(type=='cities'\
+        &s_score_total >= @option_slctd[0][0] & s_score_total <= @option_slctd[0][1]\
         & c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
         & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
         & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
         & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1]\
-        & em_score_total >= @option_slctd[5][0] & em_score_total <= @option_slctd[5][1]"
-    )
+        & em_score_total >= @option_slctd[5][0] & em_score_total <= @option_slctd[5][1])|\
+        (type=='corporates'\
+        &c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
+        & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
+        & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
+        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1])"
+        )
+
+    ci_gob = rdff.query("type=='cities'").loc[:, "s_score_total":"em_score_total"]
     ci_results = len(ci_gob)
     ci_gob = ci_gob.mean()
 
     co_gob = rdff.query("type=='corporates'").loc[:, "s_score_total":"em_score_total"]
-    co_gob = co_gob.query(
-        "c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
-        & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
-        & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
-        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1]"
-    )
     co_results = len(co_gob)
     co_gob = co_gob.fillna(0)
     co_gob = co_gob.mean()
 
-     
     fig_radar = go.Figure()
     
     fig_radar.add_trace(go.Scatterpolar(
@@ -395,4 +510,21 @@ def update_radar(*option_slctd):
     showlegend=True
     )
 
-    return fig_radar, ci_results, co_results
+
+# group df for subscore plotting
+
+    gob = rdff.groupby("type").mean()
+    gob = gob.reset_index()
+
+# id: "s_score:em_score" -> plot sub_scores
+    fig_s_score = plot_subscore(gob, 0)
+    fig_c_score = plot_subscore(gob, 1)
+    fig_o_score = plot_subscore(gob, 2)
+    fig_r_score = plot_subscore(gob, 3)
+    fig_e_score = plot_subscore(gob, 4)
+    fig_em_score = plot_subscore(gob, 5)
+
+
+
+
+    return fig_radar, ci_results, co_results, fig_s_score, fig_c_score, fig_o_score, fig_r_score, fig_e_score, fig_em_score

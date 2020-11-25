@@ -16,18 +16,22 @@ DATA_PATH = PATH.joinpath("../datasets").resolve()
 
 df = pd.read_csv(DATA_PATH.joinpath("score_descriptions.csv")) 
 df = df.loc[:, ["score", "s_type", "score_short_desc"]]
-print(df.columns)
+
+ciq = df.query("s_type == 'cities'").loc[:,["score", "score_short_desc"]]
+coq = df.query("s_type == 'corporates'").loc[:,["score", "score_short_desc"]]
+
+
+
 # ------------------------------------------------------------------------------
 # create page content
 
 cards_team = dbc.CardDeck([
     dbc.Card(
-        [
+        [   dbc.CardHeader("David Slabon"),
             dbc.CardImg(src="/assets/picture_david.jpeg", top=True, bottom=False,
                         title="David Slabon", alt='Loading Error'),
             dbc.CardBody(
                 [
-                    html.H5("David Slabon", className="card-title"),
                     dbc.CardLink("GitHub", href="https://github.com/davidslabon", target="_blank"),
                     dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/dslabon", target="_blank"),
                     dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/0ec00874-a6c0-4b9a-bf84-f51223318cb1", target="_blank")
@@ -37,52 +41,45 @@ cards_team = dbc.CardDeck([
             #color="grey",   # https://bootswatch.com/default/ for more card colors
             #inverse=True,   # change color of text (black or white)
             #outline=False,  # True = remove the block colors from the background and header
-            className="card text-white bg-primary mb-3"
     ),
     dbc.Card(
-        [
+        [   dbc.CardHeader("Felix Seeliger"),
             dbc.CardImg(src="/assets/picture_felix.jpeg", top=True, bottom=False,
                         title="Felix Seeliger", alt='Loading Error'),
             dbc.CardBody(
                 [
-                    html.H5("Felix Seeliger", className="card-title"),
                     dbc.CardLink("GitHub", href="https://github.com/Felixxxxxxxxxxx", target="_blank"),
                     dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/felixseeliger/", target="_blank"),
                     dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/3b74bfdb-7709-4cd9-977a-faa2ae9c4cfd", target="_blank")
                                 ]
             ),
         ],
-            className="card text-white bg-primary mb-3"
     ),     
     dbc.Card(
-        [
+        [   dbc.CardHeader("Olaf Steenbeck"),
             dbc.CardImg(src="/assets/picture_olaf.jpeg", top=True, bottom=False,
                         title="Olaf Steenbeck", alt='Loading Error'),
             dbc.CardBody(
                 [
-                    html.H5("Olaf Steenbeck", className="card-title"),
                     dbc.CardLink("GitHub", href="https://github.com/osteenbeck", target="_blank"),
                     dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/olaf-steenbeck-9349751b5/", target="_blank"),
                     dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/628f1f4f-efb4-4d2a-b54b-4fc11e60a615", target="_blank")
                                 ]
             ),
         ],
-        className="card text-white bg-primary mb-3"
     ),
     dbc.Card(
-        [
+        [   dbc.CardHeader("Tobias Seidel"),
             dbc.CardImg(src="/assets/picture_tobias.jpeg", top=True, bottom=False,
                         title="Tobias Seidel", alt='Loading Error'),
             dbc.CardBody(
                 [
-                    html.H5("Tobias Seidel", className="card-title"),
                     dbc.CardLink("GitHub", href="https://github.com/Toseidel", target="_blank"),
                     dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/tobias-seidel/", target="_blank"),
                     dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/656fb95c-f3ed-4892-9561-6fc58f6b0aca", target="_blank")
                                 ]
             ),
         ],
-        className="card text-white bg-primary mb-3"
         ),
     ],
     #color="dark",   # https://bootswatch.com/default/ for more card colors
@@ -92,57 +89,49 @@ cards_team = dbc.CardDeck([
 # ======================
 
 card_content_1 = [
-    dbc.CardHeader("Card header"),
+    dbc.CardHeader("City Scoring"),
     dbc.CardBody(
-        [
-            html.H5("Card title", className="card-title"),
-            html.P(
-                "This is some card content that we'll reuse",
-                className="card-text",
-            ),
+        [   
+            dbc.Table.from_dataframe(ciq, striped=True, bordered=True, hover=True, size="sm", dark=False),
         ]
     ),
 ]
 
-card_content_2 = dbc.CardBody(
-    [
-        html.Blockquote(
-            [
-                html.P(
-                    "A learning experience is one of those things that says, "
-                    "'You know that thing you just did? Don't do that.'"
-                ),
-                html.Footer(
-                    html.Small("Douglas Adams", className="text-muted")
-                ),
-            ],
-            className="blockquote",
-        )
-    ]
-)
 
 card_content_3 = [
-    dbc.CardImg(src="/static/images/placeholder286x180.png", top=True),
-    dbc.CardBody(
-        [
-            html.H5("Card with image", className="card-title"),
-            html.P(
-                "This card has an image on top, and a button below",
-                className="card-text",
-            ),
-            dbc.Button("Click me!", color="primary"),
-        ]
-    ),
+    dbc.CardHeader("Corporate Scoring"),
+    dbc.CardBody(   
+            dbc.Table.from_dataframe(coq, striped=True, bordered=True, hover=True, size="sm")
+            )
 ]
 
+card_content_4 = [
+    dbc.CardHeader("Data Science Bootcamp"),
+    html.Br(),
+    dbc.CardImg(src="/assets/neuefische.svg", top=True, bottom=False,
+                        title="bootcamp", alt='Loading Error', style={'height':'100%', 'width':'100%', },),
+    dbc.CardBody(
+        html.P("bla, bla, bla")
+    )
+]
+
+card_content_6 = [
+    dbc.CardHeader("Tools & Packages"),
+    html.Br(),
+    dbc.CardImg(src="/assets/tools.png", top=True, bottom=False,
+                        title="tools", alt='Loading Error', style={'height':'100%', 'width':'100%', },),
+    dbc.CardBody(
+        html.P("bla, bla, bla")
+    )
+]
 
 cards = dbc.CardColumns(
     [
-        dbc.Card(card_content_1, color="primary", inverse=True),
-        dbc.Card(card_content_2, body=True),
-        dbc.Card(card_content_1, color="secondary", inverse=True),
-        dbc.Card(card_content_3, color="info", inverse=True),
-        dbc.Card(card_content_1, color="success", inverse=True),
+        dbc.Card(card_content_1, inverse=False), #color="primary", inverse=True),
+        dbc.Card(card_content_3), #color="secondary", inverse=True),
+        dbc.Card(card_content_4),
+        dbc.Card(card_content_6, style={"width": "100%"}),
+        
     ]
 )
 #=======================
@@ -153,70 +142,12 @@ cards = dbc.CardColumns(
 layout = html.Div([
     navbar.navbar(),
     html.Br(),
-    dbc.Row([
-        html.Div(
-            children = """This interaktiv dashboards allows users to explore the 
-                            capstone results of Felix, Olaf, Tobi and David. For further 
-                            information please visit us on GitHub: 
-                            https://github.com/davidslabon/Capstone_UnlockingClimateSolutions.""",
-            style = {"padding-left": "3%"}       
-        ),
-    ]),
+    html.H1("Background Information"),
     html.Br(),
-    dbc.Row([
-        dbc.Col(
-            html.Div([
-                dash_table.DataTable(
-                    id='datatable-interactivity',
-                    columns=[
-                        {"name": i, "id": i, "deletable": False, "selectable": True, "hideable": True}
-                        for i in df.columns
-                    ],
-                    data=df.to_dict('records'),  # the contents of the table
-                    editable=True,              # allow editing of data inside all cells
-                    #filter_action="native",     # allow filtering of data by user ('native') or not ('none')
-                    sort_action="native",       # enables data to be sorted per-column by user or not ('none')
-                    #sort_mode="single",         # sort across 'multi' or 'single' columns
-                    column_selectable="multi",  # allow users to select 'multi' or 'single' columns
-                    #row_selectable="multi",     # allow users to select 'multi' or 'single' rows
-                    #row_deletable=True,         # choose if user can delete a row (True) or not (False)
-                    selected_columns=[],        # ids of columns that user selects
-                    selected_rows=[],           # indices of rows that user selects
-                    page_action="native",       # all data is passed to the table up-front or not ('none')
-                    page_current=0,             # page number that user is on
-                    #page_size=10,                # number of rows visible per page
-                    style_cell={                # ensure adequate header width when text is shorter than cell's text
-                        #'minWidth': 10, 
-                        'maxWidth': 20, 
-                        'width': "auto", 
-                        "textAlign": "left",
-                        'font-family':'sans-serif'
-                    },
-                    style_cell_conditional=[    # align text columns to left. By default they are aligned to right
-                        {
-                        'if': {'column_id': "score_short_desc"},
-                        'minWidth': 50, 
-                        'maxWidth': 95, 
-                        'width': "auto", 
-                        'textAlign': 'left'
-                        } 
-                    ],
-                    style_data={                # overflow cells' content into multiple lines
-                        'whiteSpace': 'normal',
-                        'height': 'auto',
-                        'width': 'auto',
-                        'margin':
-                        {"l":10, "r":10}
-                    },
-                    style_as_list_view=False, 
-                    style_table={'overflowX': 'auto', "padding":"10px 20px 20px 20px"} 
-                ),
-            ]),
-        width={"size": 6, "offset":0}
-        ),
-        dbc.Col(cards)
-    ]
-    ),
+    cards,
+    html.Br(),
+    html.H1("Project Team"),
+    html.Br(),
     dbc.Row(cards_team),
 ])
 

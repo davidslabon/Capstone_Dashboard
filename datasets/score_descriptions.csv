@@ -1,45 +1,35 @@
 score,s_type,score_short_desc,author,notebook_ref
 s_score_1,cities,Threat potential with influence on social equity,Felix,
 s_score_2,cities,Impact on vulnerable population groups,Felix,
-s_score_citotal,cities,Risk impacts on social equity,,
 c_score_1,cities,Existence of city-business collaboration,Tobi,
 c_score_2,cities,Number of existing collaborative areas,Tobi,
-c_score_citotal,cities,Total city collaboration activity,,
 c_score_3,corporates,Existence and area of value chain engagement,Tobi,cor - c_score_1
 c_score_4,corporates,Existence and intensity of customer engagement  ,Tobi,cor - c_score_2
 c_score_5,corporates,Existence and intensity of supplier engagement  ,Tobi,cor - c_score_3
 c_score_6,corporates,Existence of supportive engagement with policy makers,Tobi,cor - c_score_4
-c_score_cototal,corporates,Total corporate collaboration activity,,
 o_score_3,corporates,Existence of identified business-opportunities,Felix,cor - o_score_1
 o_score_4,corporates,Number of identified opportunities,Felix,cor - o_score_2
 o_score_5,corporates,Time horizon of opportunities,Felix,cor - o_score_3
 o_score_6,corporates,Likelihood of opportunities realization,Felix,cor - o_score_4
 o_score_7,corporates,Number of opportunity drivers,Felix,cor - o_score_5
-o_score_cototal,corporates,Identified Opportunities,,
 o_score_1,cities,Number of identified opportunities,Felix,cir - o_score_1
 o_score_2,cities,Level of activity to seize the opportunities,Felix,cir - o_score_2
-o_score_citotal,cities,Identified Opportunities,,
 r_score_1,cities,Number of climate hazards,David,
 r_score_2,cities,Impact Significance,David,
 r_score_3,cities,Current hazard probability,David,
 r_score_4,cities,Current hazard magnitude,David,
-r_score_citotal,cities,Risk Awareness,,
 r_score_5,corporates,Existence of inherent risk,David,cor - r_score_1
 r_score_6,corporates,Hazard impact potential,David,cor - r_score_2
 r_score_7,corporates,Physical risk potential,David,cor - r_score_3
-r_score_cototal,corporates,Risk Awareness,,
 e_score_1,cities,Activity level of sustainability planning,Olaf,
 e_score_2,cities,Quantity of sustainability targets,Olaf,
 e_score_3,cities,Climate change risk and vulnerability assessment,Olaf,
 e_score_4,cities,Published plan for climate change adaption,Olaf,
 e_score_6,cities,Quality of Reduction-target-types,Olaf,
 e_score_7,cities,Alignment with Paris agreement (Level of Reduction-target),Olaf,
-e_score_citotal,cities,Engagement Level,,
 e_score_8,corporates,Active Emission Targets in Reporting-Year,Olaf,
 e_score_9,corporates,Active Reduction Initiatves in Reporting-Year,Olaf,
 e_score_10,corporates,Quantity of CO2-savings for implemented initiatives,Olaf,
 e_score_11,corporates,Quality of Scope 1 Emission measuring (break down greenhouse gas types),Olaf,
-e_score_cototal,corporates,Engagement Level,,
 em_score_1,cities,Current Emissions per year / person,Felix,
 em_score_2,cities,Next-Year-Target Emissions per year / person,Felix,
-em_score_citotal,cities,Emission Level,,
