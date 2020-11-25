@@ -29,14 +29,22 @@ coq = df.query("s_type == 'corporates'").loc[:,["Score", "Short Description"]]
 cards_team = dbc.CardDeck([
     dbc.Card(
         [   dbc.CardHeader("David Slabon"),
+            html.Br(),
             dbc.CardImg(src="/assets/picture_david.jpeg", top=True, bottom=False,
-                        title="David Slabon", alt='Loading Error'),
+                        title="David Slabon", alt='Loading Error', ),
             dbc.CardBody(
                 [
-                    dbc.CardLink("GitHub", href="https://github.com/davidslabon", target="_blank"),
-                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/dslabon", target="_blank"),
-                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/0ec00874-a6c0-4b9a-bf84-f51223318cb1", target="_blank")
-                                ],
+            dbc.Row([
+                    dbc.Button("GitHub", href='https://github.com/davidslabon', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("LinkedIn", href='https://www.linkedin.com/in/dslabon', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("TalentApp", href="https://talents.neuefische.com/student/0ec00874-a6c0-4b9a-bf84-f51223318cb1", color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                ),
+            ],
             ),
         ],
             #color="grey",   # https://bootswatch.com/default/ for more card colors
@@ -45,40 +53,64 @@ cards_team = dbc.CardDeck([
     ),
     dbc.Card(
         [   dbc.CardHeader("Felix Seeliger"),
+            html.Br(),
             dbc.CardImg(src="/assets/picture_felix.jpeg", top=True, bottom=False,
                         title="Felix Seeliger", alt='Loading Error'),
             dbc.CardBody(
                 [
-                    dbc.CardLink("GitHub", href="https://github.com/Felixxxxxxxxxxx", target="_blank"),
-                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/felixseeliger/", target="_blank"),
-                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/3b74bfdb-7709-4cd9-977a-faa2ae9c4cfd", target="_blank")
-                                ]
+                dbc.Row([
+                    dbc.Button("GitHub", href='https://github.com/Felixxxxxxxxxxx', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("LinkedIn", href='https://www.linkedin.com/in/felixseeliger/', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("TalentApp", href="https://talents.neuefische.com/student/3b74bfdb-7709-4cd9-977a-faa2ae9c4cfd", color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                ),
+                ]
             ),
         ],
     ),     
     dbc.Card(
         [   dbc.CardHeader("Olaf Steenbeck"),
+            html.Br(),
             dbc.CardImg(src="/assets/picture_olaf.jpeg", top=True, bottom=False,
                         title="Olaf Steenbeck", alt='Loading Error'),
             dbc.CardBody(
                 [
-                    dbc.CardLink("GitHub", href="https://github.com/osteenbeck", target="_blank"),
-                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/olaf-steenbeck-9349751b5/", target="_blank"),
-                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/628f1f4f-efb4-4d2a-b54b-4fc11e60a615", target="_blank")
-                                ]
+                dbc.Row([
+                    dbc.Button("GitHub", href='https://github.com/osteenbeck', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("LinkedIn", href='https://www.linkedin.com/in/olaf-steenbeck-9349751b5//', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("TalentApp", href="https://talents.neuefische.com/student/628f1f4f-efb4-4d2a-b54b-4fc11e60a615", color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                ),
+                ]
             ),
         ],
     ),
     dbc.Card(
         [   dbc.CardHeader("Tobias Seidel"),
+            html.Br(),
             dbc.CardImg(src="/assets/picture_tobias.jpeg", top=True, bottom=False,
                         title="Tobias Seidel", alt='Loading Error'),
             dbc.CardBody(
                 [
-                    dbc.CardLink("GitHub", href="https://github.com/Toseidel", target="_blank"),
-                    dbc.CardLink("LinkedIn", href="https://www.linkedin.com/in/tobias-seidel/", target="_blank"),
-                    dbc.CardLink("TalentApp", href="https://talents.neuefische.com/student/656fb95c-f3ed-4892-9561-6fc58f6b0aca", target="_blank")
-                                ]
+                dbc.Row([
+                    dbc.Button("GitHub", href='https://github.com/Toseidel', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("LinkedIn", href='https://www.linkedin.com/in/tobias-seidel/', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                    dbc.Button("TalentApp", href="https://talents.neuefische.com/student/656fb95c-f3ed-4892-9561-6fc58f6b0aca", color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                ),
+                ]
             ),
         ],
         ),
@@ -106,32 +138,37 @@ card_content_3 = [
             )
 ]
 
-card_content_4 = [
-    dbc.CardHeader("Data Science Bootcamp"),
-    html.Br(),
-    dbc.CardImg(src="/assets/neuefische.svg", top=True, bottom=False,
-                        title="bootcamp", alt='Loading Error', style={'height':'100%', 'width':'100%', },),
-    dbc.CardBody(
-        html.P("bla, bla, bla")
+card_content_cdp = [
+    dbc.CardHeader("The Dataset"),
+    dbc.Row(
+        dbc.CardImg(src="/assets/cdp.png", top=True, bottom=False,
+                            title="bootcamp", alt='Loading Error', style={'height':'70%', 'width':'70%', },),
+    justify="center"),
+    dbc.CardBody([
+        html.P("The Carbon Disclosure Project(CDP) is a non-profit charity that runs a global disclosure system for investors, companies and cities to manage their environmental impact. We've worked on the world's largest survey on environemtal actions. The provided data sets contain approximately 4 million survey responses."),
+        dbc.Row([
+                    dbc.Button("CDP", href='https://www.cdp.net/en', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                )
+        ]
     )
 ]
 
-card_content_6 = [
+card_content_tools = [
     dbc.CardHeader("Tools & Packages"),
     html.Br(),
     dbc.CardImg(src="/assets/tools.png", top=True, bottom=False,
-                        title="tools", alt='Loading Error', style={'height':'100%', 'width':'100%', },),
-    dbc.CardBody(
-        html.P("bla, bla, bla")
-    )
+                        title="tools", alt='Loading Error', style={'height':'100%', 'width':'100%', },)
 ]
 
 cards = dbc.CardColumns(
     [
         dbc.Card(card_content_1, inverse=False), #color="primary", inverse=True),
         dbc.Card(card_content_3), #color="secondary", inverse=True),
-        dbc.Card(card_content_4),
-        dbc.Card(card_content_6, style={"width": "100%"}),
+        dbc.Card(card_content_tools),
+        dbc.Card(card_content_cdp, style={"width": "100%"}),
         
     ]
 )

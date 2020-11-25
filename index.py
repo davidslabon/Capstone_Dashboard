@@ -14,6 +14,7 @@ from app import server
 # Connect to your app pages
 from apps import dashboard, scoring, navbar
 
+cs = ['#46039f', '#7201a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a']#, '#fdca26', '#f0f921']
 # ----------------------------------
 # load and manipulate data for index page
 
@@ -24,48 +25,29 @@ gob = gob.sort_values("account_number", ascending=False)
 gob = gob.reset_index(drop=True)
 
 gob['text'] = gob['country'] + '<br>Count ' + (gob['account_number']).astype(str)
-limits = [(0,1),(2,5),(6,20),(21,50),(51,96)]
-colors = ["royalblue","crimson","lightseagreen","orange","lightgrey"]
-cities = []
-scale = 4
-
-fig = go.Figure()
-
-for i in range(len(limits)):
-    lim = limits[i]
-    df_sub = gob[lim[0]:lim[1]]
-    fig.add_trace(go.Scattergeo(
-        locationmode = 'ISO-3',
-        locations = df_sub["alpha3code"],
-        text = df_sub['text'],
-        marker = dict(
-            size = df_sub['account_number']*scale,
-            color = colors[i],
-            line_color='rgb(40,40,40)',
-            line_width=0.5,
-            sizemode = 'area'
-        ),
-        name = '{0} - {1}'.format(lim[0],lim[1])))
-    
-fig.update_geos(projection_type="orthographic")
+fig = go.Figure(data=go.Choropleth(locations=gob['alpha3code'],z=gob["account_number"],
+                text=gob["text"],
+                hoverinfo="text",
+                marker_line_color='white',
+                #autocolorscale=True,
+                reversescale=True,
+                showscale=False,
+                colorscale=cs))
 
 fig.update_layout(
-        #title = {"text":"CDP Survey Participation per Country", "x":0.5, "xanchor":"center", "font_dict:{weight":"bold"},
-        showlegend = False,
-        geo = dict(
-            scope = 'world',
-            landcolor = 'rgb(217, 217, 217)',
-        ),
-        height=500, 
-        margin={"r":0,"t":15,"l":0,"b":0}
-    )
-
-fig.update_geos(
-    resolution=50,
-    showcountries=True,
-    showland=True, landcolor="#FFFFF0",
-    showocean=True, oceancolor="LightBlue",
-)
+                height=500,
+                geo={
+                    'showframe': False,
+                    'showcoastlines': False,
+                    'projection': {'type': "miller"}, 
+                    "lataxis":dict(range = [-45, 90])
+                    },
+                margin=
+                {"t":0,
+                "b":0,
+                "r":0,
+                "l":0}
+                )
 
 
 # ----------------------------------
@@ -74,21 +56,42 @@ fig.update_geos(
 card_content_kaggle = [
     dbc.CardHeader("Competition"),
     html.Br(),
-    dbc.CardImg(src="/assets/kaggle.png", top=True, bottom=False,
-                        title="kaggle", alt='Loading Error', style={'height':'70%', 'width':'70%', },),
-    dbc.CardBody(
-        html.P("bla, bla, bla")
+    dbc.Row(
+        dbc.CardImg(src="/assets/kaggle.png", top=True, bottom=False,
+                        title="kaggle", alt='Loading Error', style={'height':'50%', 'width':'50%', },),
+        justify="center"),
+    dbc.CardBody([
+        html.P("This Capstone project is based on a Kaggle Competition launched on 2020/10/14 by the Carbon Disclosure Project. The aim is to promote collaboration between cities and businesses for a socially equitable climate risk mitigation. Through the development of KPIs, actors are to be enabled to optimise their climate protection strategy."),
+        dbc.Row([
+                dbc.Button("kaggle", href='https://www.kaggle.com/c/cdp-unlocking-climate-solutions', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                )
+    ])
+]
+card_content_neuefische = [
+    dbc.CardHeader("Data Science Bootcamp"),
+    html.Br(),
+    dbc.Row(
+        dbc.CardImg(src="/assets/neuefische.svg", top=True, bottom=False,
+                            title="bootcamp", alt='Loading Error', style={'height':'70%', 'width':'70%', },),
+    justify="center"),
+    html.Br(),
+    dbc.CardBody([
+        html.P("From Sep to Nov 2020,  the project team participated together in a Data Science Coding Bootcamp at Neue Fische. In 720 intensive lessons we learned about the application of machine learning algorithms, neural networks, the Data Science Lifecycle and many other aspects of Date Science. This dashboard serves to present the results of our final Capstone project.  "),
+        html.Br(),
+        dbc.Row([
+                    dbc.Button("neue fische", href='https://www.neuefische.de/', color="primary", className="mr-1", size="lg",
+                    style={"font-size": "larger", "text-decoration": "none"}),
+                ],
+                justify="center"
+                )
+        ]
     )
 ]
 
-card_content_cdp = [
-    dbc.CardHeader("Project Idea"),
-    dbc.CardImg(src="/assets/cdp.png", top=True, bottom=False,
-                        title="environment", alt='Loading Error', style={'height':'70%', 'width':'70%'}),
-    dbc.CardBody(
-        html.P("bla, bla, bla")
-    )
-]
+
 # ------------------------------------------------------------
 # app layout
 app.layout = html.Div([
@@ -103,12 +106,11 @@ index_page = html.Div([
     html.Br(),
     dbc.CardDeck([
         dbc.Card([
-            dbc.CardHeader("Unlocking Climate Solutions"),
             dbc.CardBody([
-                html.P("Indentification of Collaboration opportunities between cities and businesses for socially equitable climate risk mitigation", style={"textAlign":"center"}),
+                html.H3("Unlocking Climate Solutions", style={"textAlign":"center", "fontWeight":"bold"}),
+                html.H5("Indentification of Collaboration opportunities between cities and businesses for socially equitable climate risk mitigation", style={"textAlign":"center"}),
                 dcc.Graph(figure=fig),
                 html.P("CDP Survey Participants per Country 2018-2020", style={"textAlign":"center"}),
-                html.Br(),
                 html.Br(),
                 html.P("Find out more about our project and our interactive dashboard!", style={"textAlign":"center"}),
                 dbc.Row([
@@ -125,9 +127,9 @@ index_page = html.Div([
         ),
         dbc.Col(
             [
-            dbc.Card(card_content_kaggle, inverse=False), #color="primary", inverse=True),
+            dbc.Card(card_content_neuefische, inverse=False), #color="primary", inverse=True),
             html.Br(),
-            dbc.Card(card_content_cdp), #color="secondary", inverse=True),
+            dbc.Card(card_content_kaggle), #color="secondary", inverse=True),
             ]
         )
 

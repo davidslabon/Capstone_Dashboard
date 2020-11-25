@@ -15,7 +15,8 @@ from apps import navbar
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("../datasets").resolve()
 cs = [[0, "rgb(207, 219, 206)"],[1, "rgb(53, 66, 52)"]]
-
+cs_new_6 = ['#0d0887', '#7201a8', '#bd3786', '#ed7953', '#fb9f3a', '#f0f921']
+cs_new_5 = ['#0d0887', '#7201a8', '#bd3786', '#ed7953', '#f0f921']
 
 df = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))  
 
@@ -44,7 +45,7 @@ def plot_subscore(data, score_number):
     cols = ["type"] + all_sub_scores[score_number] 
     data = data.loc[:, cols]
 
-    fig = px.bar(data, x="type", y=cols[1:], barmode="group")
+    fig = px.bar(data, x="type", y=cols[1:], barmode="group", color_discrete_sequence=cs_new_6)
     fig.update_layout(legend=dict(
         title_text='',
         orientation="h",
@@ -325,8 +326,7 @@ layout = html.Div([
 )
 
 def update_graphs(*option_slctd):
-    print(option_slctd)
- 
+   
     dff = df.copy()
     if option_slctd[2]:
         dff = dff[dff["year"].isin( option_slctd[2])] 
@@ -350,12 +350,12 @@ def update_graphs(*option_slctd):
     # id: 'score_bar' -> plot bar_chart
     fig_bar = go.Figure(
         data=[
-            go.Bar(name="S", x=gob["year"], y=gob["s_score_total"]),#marker_color="rgb(207, 219, 206)"),
-            go.Bar(name="C",x=gob["year"], y=gob["c_score_total"]), #marker_color="rgb(169, 181, 168)"),
-            go.Bar(name="O",x=gob["year"], y=gob["o_score_total"]), #marker_color="rgb(121, 135, 120)"),
-            go.Bar(name="R",x=gob["year"], y=gob["r_score_total"]), #marker_color="rgb(89, 105, 88)"),
-            go.Bar(name="E",x=gob["year"], y=gob["e_score_total"]), #marker_color="rgb(64, 79, 63)"),
-            go.Bar(name="E2", x=gob["year"], y=gob["em_score_total"]), #marker_color="rgb(53, 66, 52)"),
+            go.Bar(name="S", x=gob["year"], y=gob["s_score_total"], marker_color=cs_new_6[0]),
+            go.Bar(name="C",x=gob["year"], y=gob["c_score_total"], marker_color=cs_new_6[1]),
+            go.Bar(name="O",x=gob["year"], y=gob["o_score_total"], marker_color=cs_new_6[2]),
+            go.Bar(name="R",x=gob["year"], y=gob["r_score_total"], marker_color=cs_new_6[3]),
+            go.Bar(name="E",x=gob["year"], y=gob["e_score_total"], marker_color=cs_new_6[4]),
+            go.Bar(name="E2", x=gob["year"], y=gob["em_score_total"], marker_color=cs_new_6[5]),
         ],
     )
 
@@ -372,6 +372,7 @@ def update_graphs(*option_slctd):
         template="simple_white",
         )
     
+
     # id: 'total_score' -> plot donut pie
     dff["score_total"] = dff.loc[:,"s_score_total":"em_score_total"].mean(axis=1)
     score_bins = pd.cut(x = dff.score_total, bins=[0,1.5,2.5,3.5,4.5,6], labels=["1","2","3","4","5"])
@@ -382,7 +383,9 @@ def update_graphs(*option_slctd):
     values = score_bins.values
 
     
-    fig_donut = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3, sort=False)])
+    fig_donut = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3, sort=False, marker={"colors":cs_new_5})])
+    #fig_donut.update_layout(color_discrete_sequence=px.colors.sequential.RdBu)
+    
 
 
     # id: 'avg_score' -> plot stacked missings
@@ -392,24 +395,31 @@ def update_graphs(*option_slctd):
 
 
     # id: 'avg_score_map' -> plot map viz
-    # plotly go
-    fig_map = go.Figure(
-        data=[go.Choropleth(
-            locations=dff["alpha3code"],
-            z=dff["score_total"],
-        )],
-    )
+
+
+    fig_map = go.Figure(data=go.Choropleth(locations=dff['alpha3code'],z=dff["score_total"],
+                #hoverinfo="text",
+                marker_line_color='white',
+                autocolorscale=True,
+                reversescale=False,
+                showscale=False,
+                colorscale="agsunset"))
 
     fig_map.update_layout(
-        margin=dict(
-                    l=0,
-                    r=0,
-                    b=10,
-                    t=10,
-                    pad=10
-                    ),
-            #paper_bgcolor="LightSteelBlue",
-    )
+                height=500,
+                geo={
+                    'showframe': False,
+                    'showcoastlines': False,
+                    'projection': {'type': "miller"}, 
+                    "lataxis":dict(range = [-45, 90])
+                    },
+                margin=
+                {"t":0,
+                "b":0,
+                "r":0,
+                "l":0}
+                )
+
 
     
     # id="top_table, flop_table" -> create simple data_table
@@ -494,7 +504,8 @@ def update_radar(*option_slctd):
         theta=['Social Equity', 'Collaboration', 'Opportunities', 'Risks',
                 'Engagement', 'Emissions'],
         fill='toself',
-        name='cities'
+        name='cities',
+        marker_color=cs_new_6[0]
         ))
 
     fig_radar.add_trace(go.Scatterpolar(
@@ -502,7 +513,8 @@ def update_radar(*option_slctd):
         theta=['Social Equity', 'Collaboration', 'Opportunities', 'Risks',
                 'Engagement', 'Emissions'],
         fill='toself',
-        name='corporates'
+        name='corporates',
+        marker_color=cs_new_6[4]
         ))
     
 

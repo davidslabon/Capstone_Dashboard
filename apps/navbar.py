@@ -25,7 +25,7 @@ def navbar():
                 style={"font-weight": "bold", "font-size": "larger", "text-decoration": "none"}), 
                 id="page-4-link")
         ],
-        brand="SCORE2",
+        brand="Home",
         brand_href="/",
         color="bg-primary",
         light=False,
