@@ -33,3 +33,5 @@ e_score_10,corporates,Quantity of CO2-savings for implemented initiatives,Olaf,
 e_score_11,corporates,Quality of Scope 1 Emission measuring (break down greenhouse gas types),Olaf,
 em_score_1,cities,Current Emissions per year / person,Felix,
 em_score_2,cities,Next-Year-Target Emissions per year / person,Felix,
+em_score_3,corporates,Corporate Emission vs. Sector Emission, Felix
+em_score_4,corporates,Contribution of scope 1,2 & 3 emissions

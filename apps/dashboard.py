@@ -31,6 +31,9 @@ df = df.groupby(["region","country", "alpha3code", "type", "year"])[[
                                                             ].agg(lambda x: x.mean(skipna=True))
 df.reset_index(inplace=True)
 
+# overall score df
+odf = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))
+
 # dashtable dataframe 
 tdf = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))
 tdf = tdf.loc[:,["entity", "s_score_total", "c_score_total", "o_score_total", "r_score_total", "e_score_total", "em_score_total", "year", "country", "type"]]
@@ -46,7 +49,7 @@ all_sub_scores = [
     ['o_score_1', 'o_score_2', 'o_score_3', 'o_score_4', 'o_score_5', 'o_score_6', 'o_score_7'], # opportunity 
     ['r_score_1', 'r_score_2', 'r_score_3', 'r_score_5', 'r_score_6', 'r_score_7'],  # risk
     ['e_score_1', 'e_score_2', 'e_score_3', 'e_score_4', 'e_score_6', 'e_score_7', 'e_score_8', 'e_score_9', 'e_score_10', 'e_score_11'], # engagement
-    ['em_score_1', 'em_score_2'] # emissions
+    ['em_score_1', 'em_score_2', 'em_score_3', 'em_score_4'] # emissions
     ]
 
 def plot_subscore(data, score_number):
@@ -131,9 +134,12 @@ row2_cards = dbc.CardDeck([
     ],
     className="w-75"),
     dbc.Card([
-        dbc.CardHeader("Top 5 Entities"),
+        dbc.CardHeader("Highlights / Lowlights"),
+        html.P("Top Entities"),
+        html.Div(id="top_table", children=[]),
         html.Br(),
-        html.Div(id="top5_table", children=[])
+        html.P("Flop Entities"),
+        html.Div(id="flop_table", children=[]),
     
     ],
     className="w-25")
@@ -316,7 +322,8 @@ layout = html.Div([
      Output(component_id='total_score', component_property='figure'),
      Output(component_id='missings', component_property='figure'),
      Output(component_id='avg_score_map', component_property='figure'),
-     Output(component_id='top5_table', component_property='children')],
+     Output(component_id='top_table', component_property='children'),
+     Output(component_id='flop_table', component_property='children')],
     [Input(component_id='slct_type', component_property='value'),
      Input(component_id='slct_country', component_property='value'),
      Input(component_id='slct_year', component_property='value'),
@@ -371,16 +378,16 @@ def update_graphs(*option_slctd):
         template="simple_white",
         )
     
-
     # id: 'total_score' -> plot donut pie
     dff["score_total"] = dff.loc[:,"s_score_total":"em_score_total"].mean(axis=1)
     score_bins = pd.cut(x = dff.score_total, bins=[0,1.5,2.5,3.5,4.5,6], labels=["1","2","3","4","5"])
     score_bins = round((score_bins.value_counts(normalize=True)*100),1)
     score_bins = score_bins.sort_index()
+    print(dff)
 
     labels = ['1','2','3','4','5']
     values = score_bins.values
-    print(dff.head())
+
     
     fig_donut = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3, sort=False)])
 
@@ -414,7 +421,7 @@ def update_graphs(*option_slctd):
     )
 
     
-    # id="top5_table" -> create simple data_table
+    # id="top_table, flop_table" -> create simple data_table
 
     tdff = tdf.copy()
     if option_slctd[2]:
@@ -425,13 +432,19 @@ def update_graphs(*option_slctd):
         tdff = tdff[tdff["type"].isin(option_slctd[0])] 
 
     tdff["score_total"] = tdff.loc[:,"s_score_total":"em_score_total"].mean(axis=1)
+    tdff = tdff.dropna(axis="rows", subset=["score_total"])
     tdff.sort_values(by="score_total", ascending=False, inplace=True)
-    top5_df = tdff.head().loc[:, ["entity", "score_total"]]
-    top5_df.rename(columns={"entity":"Entity", "score_total":"Total Score"}, inplace=True)
-    table = dbc.Table.from_dataframe(top5_df, striped=True, bordered=True, hover=True, size="sm")
+    top_df = tdff.head(3).loc[:, ["entity", "country","score_total"]]
+    top_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country"}, inplace=True)
+    top_table = dbc.Table.from_dataframe(top_df, striped=True, bordered=True, hover=True, size="sm")
+
+    flop_df = tdff.tail(3).loc[:, ["entity", "country","score_total"]]
+    flop_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country"}, inplace=True)
+    flop_table = dbc.Table.from_dataframe(flop_df, striped=True, bordered=True, hover=True, size="sm")
+
     
 
-    return fig_bar, fig_donut, fig_missing, fig_map, table
+    return fig_bar, fig_donut, fig_missing, fig_map, top_table, flop_table
 
 
     
@@ -469,7 +482,8 @@ def update_radar(*option_slctd):
         &c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
         & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
         & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
-        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1])"
+        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1]\
+        & em_score_total >= @option_slctd[5][0] & em_score_total <= @option_slctd[5][1])"
         )
 
     ci_gob = rdff.query("type=='cities'").loc[:, "s_score_total":"em_score_total"]

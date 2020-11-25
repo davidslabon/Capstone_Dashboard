@@ -16,9 +16,10 @@ DATA_PATH = PATH.joinpath("../datasets").resolve()
 
 df = pd.read_csv(DATA_PATH.joinpath("score_descriptions.csv")) 
 df = df.loc[:, ["score", "s_type", "score_short_desc"]]
+df.rename(columns={"score":"Score", "score_short_desc":"Short Description"}, inplace=True)
 
-ciq = df.query("s_type == 'cities'").loc[:,["score", "score_short_desc"]]
-coq = df.query("s_type == 'corporates'").loc[:,["score", "score_short_desc"]]
+ciq = df.query("s_type == 'cities'").loc[:,["Score", "Short Description"]]
+coq = df.query("s_type == 'corporates'").loc[:,["Score", "Short Description"]]
 
 
 
