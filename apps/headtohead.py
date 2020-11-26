@@ -190,9 +190,10 @@ def update_graphs(*option_slctd):
    
     fig = px.bar(
         data, 
-        x="head", 
+        x="head",
         y=["s_score_total", "c_score_total", "o_score_total", "r_score_total", "e_score_total", "em_score_total"], 
         barmode="group",
+        orientation="v",
         color_discrete_sequence=cs_new_6, 
         range_y=(0,5))
 
@@ -201,8 +202,8 @@ def update_graphs(*option_slctd):
         orientation="h",
         yanchor="bottom",
         y=1.02,
-        xanchor="right",
-        x=1
+        xanchor="center",
+        x=0.5
     ),
     xaxis_title = None,
     yaxis_title = None,
@@ -212,6 +213,7 @@ def update_graphs(*option_slctd):
         "b":0
     },
     template="simple_white")
+
     return fig
 
    
