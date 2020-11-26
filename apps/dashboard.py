@@ -404,7 +404,6 @@ layout = html.Div([
      Input(component_id='slct_e_score', component_property='value'),
      Input(component_id='slct_em_score', component_property='value')]
 )
-
 def update_graphs(*option_slctd):
       
     dff = df.copy()
@@ -416,7 +415,8 @@ def update_graphs(*option_slctd):
         dff = dff[dff["type"].isin(option_slctd[0])]
     if option_slctd[3]:
         dff = dff[dff["region"].isin(option_slctd[3])]
-    print(dff.columns)
+    
+
     gob = dff.groupby(["year"])[[
                             's_score_total', 
                             'c_score_total', 

@@ -12,7 +12,7 @@ from app import app
 from app import server
 
 # Connect to your app pages
-from apps import dashboard, scoring, navbar
+from apps import dashboard, project, navbar, headtohead
 
 cs = ['#46039f', '#7201a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a']#, '#fdca26', '#f0f921']
 # ----------------------------------
@@ -145,8 +145,10 @@ index_page = html.Div([
 def display_page(pathname):
     if pathname == '/apps/dashboard':
         return dashboard.layout
-    if pathname == '/apps/scoring':
-        return scoring.layout
+    if pathname == '/apps/project':
+        return project.layout
+    if pathname == '/apps/headtohead':
+        return headtohead.layout
     else:
         return index_page
 

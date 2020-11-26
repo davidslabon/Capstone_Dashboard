@@ -10,8 +10,13 @@ def navbar():
                 id="page-1-link"
                 ),
             dbc.NavItem(dbc.NavLink(
+                "Head2Head", 
+                href="/apps/headtohead", 
+                style={"font-weight": "bold", "font-size": "larger", "text-decoration": "none"}), 
+                id="page-3-link"),               
+            dbc.NavItem(dbc.NavLink(
                 "Project", 
-                href="/apps/scoring", 
+                href="/apps/project", 
                 style={"font-weight": "bold", "font-size": "larger", "text-decoration": "none"}), 
                 id="page-2-link"),
             dbc.NavItem(dbc.NavLink(
