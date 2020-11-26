@@ -29,7 +29,6 @@ coq = df.query("s_type == 'corporates'").loc[:,["Score", "Short Description"]]
 cards_team = dbc.CardDeck([
     dbc.Card(
         [   dbc.CardHeader("David Slabon"),
-            html.Br(),
             dbc.CardImg(src="/assets/picture_david.jpeg", top=True, bottom=False,
                         title="David Slabon", alt='Loading Error', ),
             dbc.CardBody(
@@ -53,7 +52,6 @@ cards_team = dbc.CardDeck([
     ),
     dbc.Card(
         [   dbc.CardHeader("Felix Seeliger"),
-            html.Br(),
             dbc.CardImg(src="/assets/picture_felix.jpeg", top=True, bottom=False,
                         title="Felix Seeliger", alt='Loading Error'),
             dbc.CardBody(
@@ -74,7 +72,6 @@ cards_team = dbc.CardDeck([
     ),     
     dbc.Card(
         [   dbc.CardHeader("Olaf Steenbeck"),
-            html.Br(),
             dbc.CardImg(src="/assets/picture_olaf.jpeg", top=True, bottom=False,
                         title="Olaf Steenbeck", alt='Loading Error'),
             dbc.CardBody(
@@ -95,7 +92,6 @@ cards_team = dbc.CardDeck([
     ),
     dbc.Card(
         [   dbc.CardHeader("Tobias Seidel"),
-            html.Br(),
             dbc.CardImg(src="/assets/picture_tobias.jpeg", top=True, bottom=False,
                         title="Tobias Seidel", alt='Loading Error'),
             dbc.CardBody(
@@ -180,12 +176,10 @@ cards = dbc.CardColumns(
 layout = html.Div([
     navbar.navbar(),
     html.Br(),
-    html.H1("Background Information"),
-    html.Br(),
+    html.H3("Background Information", style={'fontWeight': 'bold'}),
     cards,
     html.Br(),
-    html.H1("Project Team"),
-    html.Br(),
+    html.H3("Project Team", style={'fontWeight': 'bold'}),
     dbc.Row(cards_team),
 ])
 

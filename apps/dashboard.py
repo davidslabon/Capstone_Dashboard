@@ -95,7 +95,7 @@ def plot_subscore(data, score_number):
     
     data = data.loc[:, cols]
 
-    fig = px.bar(data, x="type", y=cols[1:], barmode="group", color_discrete_sequence=cs_new_6)
+    fig = px.bar(data, x="type", y=cols[1:], barmode="group", color_discrete_sequence=cs_new_6, range_y=(0,5))
     fig.update_layout(legend=dict(
         title_text='',
         orientation="h",
@@ -112,8 +112,7 @@ def plot_subscore(data, score_number):
         "b":0
     },
     template="simple_white")
-    print(fig.data[1].name)
-
+    
     return fig
 
 # ------------------------------------------------------------------------------
@@ -221,7 +220,8 @@ row3_cards = dbc.CardDeck([
                     3: "3",
                     4: "4",
                     5: "5"
-                }
+                },
+                className="border-secondary"
             ),
             html.P("Collaboration"), 
             dcc.RangeSlider(
@@ -359,12 +359,12 @@ row4_cards = dbc.CardGroup([
 layout = html.Div([
     navbar.navbar(),
     html.Br(),
-    html.H1("Overview"),
+    html.H3("Overview", style={'fontWeight': 'bold'}),
     row1_cards,
     html.Br(),
     row2_cards,
     html.Br(),
-    html.H1("Dependencies"),
+    html.H3("Dependencies", style={'fontWeight': 'bold'}),
     row3_cards,
     html.Br(),
     row4_cards,
