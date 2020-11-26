@@ -85,6 +85,8 @@ name_dict= {
 }
 
 df = df.rename(columns=name_dict)
+empty_gob = empty_gob.rename(columns=name_dict)
+
 
 def plot_subscore(data, score_number):
     cols = ["type"] + all_sub_descriptions[score_number]
@@ -379,11 +381,26 @@ layout = html.Div([
      Output(component_id='avg_score', component_property='children'),
      Output(component_id='no_scores', component_property='children'),
      Output(component_id='avg_score_map', component_property='figure'),
-     Output(component_id='table', component_property='children')],
+     Output(component_id='table', component_property='children'),
+     Output(component_id='score_radar', component_property='figure'),
+     Output(component_id='city_results', component_property='children'),
+     Output(component_id='corporate_results', component_property='children'),
+     Output(component_id='s_score', component_property='figure'),
+     Output(component_id='c_score', component_property='figure'),
+     Output(component_id='o_score', component_property='figure'),
+     Output(component_id='r_score', component_property='figure'),
+     Output(component_id='e_score', component_property='figure'),
+     Output(component_id='em_score', component_property='figure')],
     [Input(component_id='slct_type', component_property='value'),
      Input(component_id='slct_country', component_property='value'),
      Input(component_id='slct_year', component_property='value'),
-     Input(component_id='slct_region', component_property='value')]
+     Input(component_id='slct_region', component_property='value'),
+     Input(component_id='slct_s_score', component_property='value'),
+     Input(component_id='slct_c_score', component_property='value'),
+     Input(component_id='slct_o_score', component_property='value'),
+     Input(component_id='slct_r_score', component_property='value'),
+     Input(component_id='slct_e_score', component_property='value'),
+     Input(component_id='slct_em_score', component_property='value')]
      )
 
 def update_graphs(*option_slctd):
@@ -461,7 +478,7 @@ def update_graphs(*option_slctd):
 
     gob = dff.groupby(["country", "alpha3code"])["score_total"].mean()
     gob = gob.reset_index()
-    
+
     fig_map = go.Figure(data=go.Choropleth(locations=gob['alpha3code'],z=gob["score_total"],
                 #hoverinfo="text",
                 marker_line_color='white',
@@ -502,46 +519,21 @@ def update_graphs(*option_slctd):
     result_df = pd.concat([top_df, line, flop_df])
     table = dbc.Table.from_dataframe(result_df, striped=True, bordered=False, hover=True, size="sm")
     
-    return fig_bar, fig_donut, avg_score, no_scores, fig_map, table
-
-
-# ------------------------------------------------------------------------------
-# Connect the Plotly graphs with Dash Components
-@app.callback([Output(component_id='score_radar', component_property='figure'),
-     Output(component_id='city_results', component_property='children'),
-     Output(component_id='corporate_results', component_property='children'),
-     Output(component_id='s_score', component_property='figure'),
-     Output(component_id='c_score', component_property='figure'),
-     Output(component_id='o_score', component_property='figure'),
-     Output(component_id='r_score', component_property='figure'),
-     Output(component_id='e_score', component_property='figure'),
-     Output(component_id='em_score', component_property='figure')],
-     [Input(component_id='slct_s_score', component_property='value'),
-     Input(component_id='slct_c_score', component_property='value'),
-     Input(component_id='slct_o_score', component_property='value'),
-     Input(component_id='slct_r_score', component_property='value'),
-     Input(component_id='slct_e_score', component_property='value'),
-     Input(component_id='slct_em_score', component_property='value')]
-    )
-
-def update_dep_graphs(*option_slctd):
-
-    # update radar chart and subplots  
-    dff = df.copy()
+    
     rdff = dff.query(
         "(type=='cities'\
-        &s_score_total >= @option_slctd[0][0] & s_score_total <= @option_slctd[0][1]\
-        & c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
-        & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
-        & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
-        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1]\
-        & em_score_total >= @option_slctd[5][0] & em_score_total <= @option_slctd[5][1])|\
+        &s_score_total >= @option_slctd[4][0] & s_score_total <= @option_slctd[4][1]\
+        & c_score_total >= @option_slctd[5][0] & c_score_total <= @option_slctd[5][1]\
+        & o_score_total >= @option_slctd[6][0] & o_score_total <= @option_slctd[6][1]\
+        & r_score_total >= @option_slctd[7][0] & r_score_total <= @option_slctd[7][1]\
+        & e_score_total >= @option_slctd[8][0] & e_score_total <= @option_slctd[8][1]\
+        & em_score_total >= @option_slctd[9][0] & em_score_total <= @option_slctd[9][1])|\
         (type=='corporates'\
-        &c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
-        & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
-        & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
-        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1]\
-        & em_score_total >= @option_slctd[5][0] & em_score_total <= @option_slctd[5][1])"
+        &c_score_total >= @option_slctd[5][0] & c_score_total <= @option_slctd[5][1]\
+        & o_score_total >= @option_slctd[6][0] & o_score_total <= @option_slctd[6][1]\
+        & r_score_total >= @option_slctd[7][0] & r_score_total <= @option_slctd[7][1]\
+        & e_score_total >= @option_slctd[8][0] & e_score_total <= @option_slctd[8][1]\
+        & em_score_total >= @option_slctd[9][0] & em_score_total <= @option_slctd[9][1])"
         )
 
     ci_gob = rdff.query("type=='cities'").loc[:, "s_score_total":"em_score_total"]
@@ -603,5 +595,5 @@ def update_dep_graphs(*option_slctd):
     fig_em_score = plot_subscore(gob, 5)
 
 
-    return fig_radar, ci_results, co_results, fig_s_score, fig_c_score, fig_o_score, fig_r_score, fig_e_score, fig_em_score
+    return fig_bar, fig_donut, avg_score, no_scores, fig_map, table, fig_radar, ci_results, co_results, fig_s_score, fig_c_score, fig_o_score, fig_r_score, fig_e_score, fig_em_score
 
