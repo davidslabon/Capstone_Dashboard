@@ -19,16 +19,15 @@ cs_new_6 = ['#0d0887', '#7201a8', '#bd3786', '#ed7953', '#fb9f3a', '#f0f921']
 cs_new_5 = ['#0d0887', '#7201a8', '#bd3786', '#ed7953', '#f0f921']
 
 df = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))  
+empty_gob = pd.read_csv(DATA_PATH.joinpath("empty_gob.csv"), delimiter=";")
 
 country_list = df.country.sort_values().unique()
 region_list = df.region.sort_values().unique()
 
-# dashtable dataframe 
-tdf = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl"))
-tdf = tdf.loc[:,["entity", "s_score_total", "c_score_total", "o_score_total", "r_score_total", "e_score_total", "em_score_total", "year", "country", "type"]]
-
 # radar dataframe
 rdf = pd.read_pickle(DATA_PATH.joinpath("complete_score.pkl")) 
+
+
 
 # score definition
 
@@ -36,13 +35,64 @@ all_sub_scores = [
     ['s_score_1', 's_score_2'], # social
     ['c_score_1', 'c_score_2', 'c_score_3', 'c_score_4', 'c_score_5', 'c_score_6'], # collab
     ['o_score_1', 'o_score_2', 'o_score_3', 'o_score_4', 'o_score_5', 'o_score_6', 'o_score_7'], # opportunity 
-    ['r_score_1', 'r_score_2', 'r_score_3', 'r_score_5', 'r_score_6', 'r_score_7'],  # risk
+    ['r_score_1', 'r_score_2', 'r_score_3', 'r_score_4','r_score_5', 'r_score_6', 'r_score_7'],  # risk
     ['e_score_1', 'e_score_2', 'e_score_3', 'e_score_4', 'e_score_6', 'e_score_7', 'e_score_8', 'e_score_9', 'e_score_10', 'e_score_11'], # engagement
     ['em_score_1', 'em_score_2', 'em_score_3', 'em_score_4'] # emissions
     ]
 
+all_sub_descriptions = [
+    ['Threat potential', 'Vulnerable pop'], # social
+    ['Collab exist', 'No of collabs', 'Value Chain Eng', 'Customer Eng', 'Supplier Eng', 'Policy Eng'], # collab
+    ['Activity lvl1', 'No of opp1', 'Opp exist', 'No of opp2', 'Time horizon', 'Likelihood', 'Drivers'], # opportunity 
+    ['No of risks', 'Impact sig', 'Current prob', 'Current mag', 'Inherent', 'Impact pot', 'Physical risk'],  # risk
+    ['Activity lvl2', 'Target Quant', 'Assessment', 'Planning', 'Target Qual', 'Paris Align', 'Em Targets', 'Reduct Init', 'Savings Quant', 'Measuring Qual'], # engagement
+    ['Current Em', 'Target Em', 'Sector relativ', 'Em Scopes'] # emissions
+    ]
+
+name_dict= {
+    's_score_1':'Threat potential', 
+    's_score_2':'Vulnerable pop',
+    'c_score_1':'Collab exist', 
+    'c_score_2':'No of collabs', 
+    'c_score_3':'Value Chain Eng', 
+    'c_score_4':'Customer Eng', 
+    'c_score_5':'Supplier Eng', 
+    'c_score_6':'Policy Eng',
+    'o_score_1':'Activity lvl1', 
+    'o_score_2':'No of opp1', 
+    'o_score_3':'Opp exist', 
+    'o_score_4':'No of opp2', 
+    'o_score_5':'Time horizon',  
+    'o_score_6':'Likelihood', 
+    'o_score_7':'Drivers',
+    'r_score_1':'No of risks', 
+    'r_score_2':'Impact sig', 
+    'r_score_3':'Current prob', 
+    'r_score_4':'Current mag', 
+    'r_score_5':'Inherent', 
+    'r_score_6':'Impact pot',
+    'r_score_7':'Physical risk',
+    'e_score_1':'Activity lvl2',
+    'e_score_2':'Target Quant', 
+    'e_score_3':'Assessment', 
+    'e_score_4':'Planning', 
+    'e_score_6':'Target Qual', 
+    'e_score_7':'Paris Align', 
+    'e_score_8':'Em Targets', 
+    'e_score_9':'Reduct Init', 
+    'e_score_10':'Savings Quant',
+    'e_score_11':'Measuring Qual',
+    'em_score_1':'Current Em', 
+    'em_score_2':'Target Em', 
+    'em_score_3':'Sector relativ', 
+    'em_score_4':'Em Scopes'
+}
+
+df = df.rename(columns=name_dict)
+
 def plot_subscore(data, score_number):
-    cols = ["type"] + all_sub_scores[score_number] 
+    cols = ["type"] + all_sub_descriptions[score_number]
+    
     data = data.loc[:, cols]
 
     fig = px.bar(data, x="type", y=cols[1:], barmode="group", color_discrete_sequence=cs_new_6)
@@ -62,6 +112,7 @@ def plot_subscore(data, score_number):
         "b":0
     },
     template="simple_white")
+    print(fig.data[1].name)
 
     return fig
 
@@ -104,7 +155,7 @@ row1_cards = dbc.CardDeck([
                         {"label": "2020", "value": "2020"}],
                 multi=True,
                 value="",
-            )
+            ),
         ])
     ]),
     dbc.Card([
@@ -140,6 +191,7 @@ row2_cards = dbc.CardDeck([
     className="w-75"),
     dbc.Card([
         dbc.CardHeader("Highlights / Lowlights"),
+        html.Br(),
         html.Br(),
         html.Div(id="table", children=[]),
         html.Br(),  
@@ -317,7 +369,6 @@ layout = html.Div([
     html.Br(),
     row4_cards,
     html.Br(),
-    html.H1("Detailed Comparison"),
 ])
 
 
@@ -332,15 +383,30 @@ layout = html.Div([
      Output(component_id='avg_score', component_property='children'),
      Output(component_id='no_scores', component_property='children'),
      Output(component_id='avg_score_map', component_property='figure'),
-     Output(component_id='table', component_property='children')],
+     Output(component_id='table', component_property='children'),
+     Output(component_id='score_radar', component_property='figure'),
+     Output(component_id='city_results', component_property='children'),
+     Output(component_id='corporate_results', component_property='children'),
+     Output(component_id='s_score', component_property='figure'),
+     Output(component_id='c_score', component_property='figure'),
+     Output(component_id='o_score', component_property='figure'),
+     Output(component_id='r_score', component_property='figure'),
+     Output(component_id='e_score', component_property='figure'),
+     Output(component_id='em_score', component_property='figure')],
     [Input(component_id='slct_type', component_property='value'),
      Input(component_id='slct_country', component_property='value'),
      Input(component_id='slct_year', component_property='value'),
-     Input(component_id='slct_region', component_property='value')]
+     Input(component_id='slct_region', component_property='value'),
+     Input(component_id='slct_s_score', component_property='value'),
+     Input(component_id='slct_c_score', component_property='value'),
+     Input(component_id='slct_o_score', component_property='value'),
+     Input(component_id='slct_r_score', component_property='value'),
+     Input(component_id='slct_e_score', component_property='value'),
+     Input(component_id='slct_em_score', component_property='value')]
 )
 
 def update_graphs(*option_slctd):
-   
+      
     dff = df.copy()
     if option_slctd[2]:
         dff = dff[dff["year"].isin( option_slctd[2])] 
@@ -350,7 +416,7 @@ def update_graphs(*option_slctd):
         dff = dff[dff["type"].isin(option_slctd[0])]
     if option_slctd[3]:
         dff = dff[dff["region"].isin(option_slctd[3])]
-
+    print(dff.columns)
     gob = dff.groupby(["year"])[[
                             's_score_total', 
                             'c_score_total', 
@@ -437,69 +503,36 @@ def update_graphs(*option_slctd):
 
     
     # id="top_table, flop_table" -> create simple data_table
-
-    tdff = tdf.copy()
-    if option_slctd[2]:
-        tdff = tdff[tdff["year"].isin(option_slctd[2])] 
-    if option_slctd[1]:
-        tdff = tdff[tdff["country"].isin(option_slctd[1])] 
-    if option_slctd[0]:
-        tdff = tdff[tdff["type"].isin(option_slctd[0])] 
-
-    tdff["score_total"] = round(tdff.loc[:,"s_score_total":"em_score_total"].mean(axis=1), 2)
-    tdff = tdff.dropna(axis="rows", subset=["score_total"])
-    tdff.sort_values(by="score_total", ascending=False, inplace=True)
-    top_df = tdff.head(3).loc[:, ["entity", "country", "year", "score_total"]]
+    dff["score_total"] = round(dff.loc[:,"s_score_total":"em_score_total"].mean(axis=1), 2)
+    dff = dff.dropna(axis="rows", subset=["score_total"])
+    dff.sort_values(by="score_total", ascending=False, inplace=True)
+    top_df = dff.head(3).loc[:, ["entity", "country", "year", "score_total"]]
     top_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country", "year":"Year"}, inplace=True)
     
     line = pd.DataFrame({"Entity":"...", "Country":"...", "Year":"...", "Total Score":"..."}, index =[3])
     
-    flop_df = tdff.tail(3).loc[:, ["entity", "country", "year", "score_total"]]
+    flop_df = dff.tail(3).loc[:, ["entity", "country", "year", "score_total"]]
     flop_df.rename(columns={"entity":"Entity", "score_total":"Total Score", "country":"Country", "year":"Year"}, inplace=True)
     
     result_df = pd.concat([top_df, line, flop_df])
-    table = dbc.Table.from_dataframe(result_df, striped=True, bordered=True, hover=True, size="sm")
-
-    return fig_bar, fig_donut, avg_score, no_scores, fig_map, table
+    table = dbc.Table.from_dataframe(result_df, striped=True, bordered=False, hover=True, size="sm")
 
 
-    
-
-@app.callback([Output(component_id='score_radar', component_property='figure'),
-    Output(component_id='city_results', component_property='children'),
-    Output(component_id='corporate_results', component_property='children'),
-    Output(component_id='s_score', component_property='figure'),
-    Output(component_id='c_score', component_property='figure'),
-    Output(component_id='o_score', component_property='figure'),
-    Output(component_id='r_score', component_property='figure'),
-    Output(component_id='e_score', component_property='figure'),
-    Output(component_id='em_score', component_property='figure')],   
-    [Input(component_id='slct_s_score', component_property='value'),
-    Input(component_id='slct_c_score', component_property='value'),
-    Input(component_id='slct_o_score', component_property='value'),
-    Input(component_id='slct_r_score', component_property='value'),
-    Input(component_id='slct_e_score', component_property='value'),
-    Input(component_id='slct_em_score', component_property='value')]
-
-)
-
-def update_radar(*option_slctd):
-    
-    rdff = rdf.copy() 
-    rdff = rdff.query(
+    # update radar chart and subplots  
+    rdff = dff.query(
         "(type=='cities'\
-        &s_score_total >= @option_slctd[0][0] & s_score_total <= @option_slctd[0][1]\
-        & c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
-        & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
-        & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
-        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1]\
-        & em_score_total >= @option_slctd[5][0] & em_score_total <= @option_slctd[5][1])|\
+        &s_score_total >= @option_slctd[4][0] & s_score_total <= @option_slctd[4][1]\
+        & c_score_total >= @option_slctd[5][0] & c_score_total <= @option_slctd[5][1]\
+        & o_score_total >= @option_slctd[6][0] & o_score_total <= @option_slctd[6][1]\
+        & r_score_total >= @option_slctd[7][0] & r_score_total <= @option_slctd[7][1]\
+        & e_score_total >= @option_slctd[8][0] & e_score_total <= @option_slctd[8][1]\
+        & em_score_total >= @option_slctd[9][0] & em_score_total <= @option_slctd[9][1])|\
         (type=='corporates'\
-        &c_score_total >= @option_slctd[1][0] & c_score_total <= @option_slctd[1][1]\
-        & o_score_total >= @option_slctd[2][0] & o_score_total <= @option_slctd[2][1]\
-        & r_score_total >= @option_slctd[3][0] & r_score_total <= @option_slctd[3][1]\
-        & e_score_total >= @option_slctd[4][0] & e_score_total <= @option_slctd[4][1]\
-        & em_score_total >= @option_slctd[5][0] & em_score_total <= @option_slctd[5][1])"
+        &c_score_total >= @option_slctd[5][0] & c_score_total <= @option_slctd[5][1]\
+        & o_score_total >= @option_slctd[6][0] & o_score_total <= @option_slctd[6][1]\
+        & r_score_total >= @option_slctd[7][0] & r_score_total <= @option_slctd[7][1]\
+        & e_score_total >= @option_slctd[8][0] & e_score_total <= @option_slctd[8][1]\
+        & em_score_total >= @option_slctd[9][0] & em_score_total <= @option_slctd[9][1])"
         )
 
     ci_gob = rdff.query("type=='cities'").loc[:, "s_score_total":"em_score_total"]
@@ -508,7 +541,6 @@ def update_radar(*option_slctd):
 
     co_gob = rdff.query("type=='corporates'").loc[:, "s_score_total":"em_score_total"]
     co_results = len(co_gob)
-    co_gob = co_gob.fillna(0)
     co_gob = co_gob.mean()
 
     fig_radar = go.Figure()
@@ -543,12 +575,16 @@ def update_radar(*option_slctd):
     )
 
 
-# group df for subscore plotting
+    # group df for subscore plotting
 
     gob = rdff.groupby("type").mean()
     gob = gob.reset_index()
+    
+    if gob.empty:
+        print('DataFrame is empty!')
+        gob = empty_gob
 
-# id: "s_score:em_score" -> plot sub_scores
+    # id: "s_score:em_score" -> plot sub_scores
     fig_s_score = plot_subscore(gob, 0)
     fig_c_score = plot_subscore(gob, 1)
     fig_o_score = plot_subscore(gob, 2)
@@ -557,6 +593,5 @@ def update_radar(*option_slctd):
     fig_em_score = plot_subscore(gob, 5)
 
 
+    return fig_bar, fig_donut, avg_score, no_scores, fig_map, table, fig_radar, ci_results, co_results, fig_s_score, fig_c_score, fig_o_score, fig_r_score, fig_e_score, fig_em_score
 
-
-    return fig_radar, ci_results, co_results, fig_s_score, fig_c_score, fig_o_score, fig_r_score, fig_e_score, fig_em_score
