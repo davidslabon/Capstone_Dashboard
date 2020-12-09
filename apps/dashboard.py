@@ -84,6 +84,10 @@ name_dict= {
     'em_score_4':'Em Scopes'
 }
 
+region_dict = df.groupby("region")
+region_dict = region_dict.country.unique().to_dict()
+
+
 df = df.rename(columns=name_dict)
 empty_gob = empty_gob.rename(columns=name_dict)
 
@@ -139,9 +143,9 @@ row1_cards = dbc.CardDeck([
             dcc.Dropdown(
                 id="slct_country", 
                 placeholder='Select a country',
-                options=[{"label":x, "value":x} for x in country_list],
+                #options=[{"label":x, "value":x} for x in country_list],
                 multi=True,
-                value="",
+                #value="",
             ),
             html.Br(),
             dcc.Dropdown(
@@ -375,6 +379,26 @@ layout = html.Div([
 
 # ------------------------------------------------------------------------------
 # Connect the Plotly graphs with Dash Components
+
+@app.callback(
+    Output('slct_country', 'options'),
+    Input('slct_region', 'value')
+)
+
+def update_date_dropdown(regions):
+
+    if regions:
+        r_list = []
+        for region in regions:
+            r_list.append([{'label': i, 'value': i} for i in region_dict[region]])
+        
+        flattend = [val for sublist in r_list for val in sublist]
+
+        return flattend
+
+    else:
+        return [{"label":x, "value":x} for x in country_list]
+
 @app.callback(
     [Output(component_id='score_bar', component_property='figure'),
      Output(component_id='total_score', component_property='figure'),
